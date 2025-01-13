@@ -1,10 +1,7 @@
-require("dotenv").config();
-const User = require("../model/user");
-const db = require("../config/mongo");
-const { ObjectId } = require("mongodb");
-const usersCollection = db.collection("users");
+const UserModel = require("../model/userModel");
+
 const typeDefs = `#graphql
-    # User type represents each User's properties
+
     type User {
     _id: ID
     name: String
@@ -12,54 +9,43 @@ const typeDefs = `#graphql
     email: String
   }
 
-
-
   type Token{
   access_token: String
   }
 
+  type Query {
+        getUserById(id: ID!): User
+    }
+
     type Mutation {
-    register(name: String!, username: String!, email: String!, password: String!): User
-    login(email: String!,password: String!): Token
+    register(name: String, username: String, email: String, password: String): User
+    login(email: String,password: String): Token
   }
   `;
 
 const resolvers = {
   Query: {
-    searchUser: async (_, { query }) => {
-      const users = await usersCollection
-        .find({
-          $or: [
-            { name: { $regex: query, $options: "i" } },
-            { username: { $regex: query, $options: "i" } },
-          ],
-        })
-        .toArray();
-      return users;
-    },
-    getUser: async (_, { id }) => {
-      const user = await usersCollection.findOne({ _id: new ObjectId(id) });
+    getUserById: async (_, args) => {
+      const { _id } = args;
+      const user = UserModel.getUserById(_id);
       return user;
     },
   },
 
-  //args akan mendapatkan data yang ada di type query
-  //kalo fiedl itu yang after args :
   Mutation: {
     register: async (_, args) => {
+      console.log(args,'ini args');
+      
       const { name, username, email, password } = args;
+      const newUser = {name, username, email, password};
 
-      const newUser = await User.register(name, username, email, password);
-      return {
-        _id: newUser.insertedId,
-        name,
-        username,
-        email,
-      };
+      await UserModel.register(newUser);
+
+      return newUser
     },
     login: async (_, args) => {
       const { email, password } = args;
-      const user = await User.login(email, password);
+      const user = await UserModel.login(email, password);
       return user;
     },
   },
