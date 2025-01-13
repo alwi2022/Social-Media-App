@@ -71,7 +71,7 @@ class UserModel {
     if (!compare) {
       throw new Error("Invalid username/passowrd");
     }
-    const payload = { id: user._id, username: user.username};
+    const payload = { id: user._id};
 
     const token = signToken(payload);
 

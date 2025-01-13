@@ -2,10 +2,10 @@ require("dotenv").config();
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 
-// const {
-//   typeDefs: typeDefsPost,
-//   resolvers: resolversPost,
-// } = require("./schemas/post");
+const {
+  typeDefs: typeDefsPost,
+  resolvers: resolversPost,
+} = require("./schemas/postSchema");
 
 const {
   typeDefs: typeDefsUser,
@@ -13,8 +13,8 @@ const {
 } = require("./schemas/userSchema");
 
 const server = new ApolloServer({
-  typeDefs: [typeDefsUser],
-  resolvers: [resolversUser],
+  typeDefs: [typeDefsUser,typeDefsPost],
+  resolvers: [resolversUser,resolversPost],
   introspection: true,
   //introspection:true untuk kemudahan pembacaan buat instruktor
 });
