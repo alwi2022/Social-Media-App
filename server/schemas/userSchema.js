@@ -19,7 +19,7 @@ const typeDefs = `#graphql
 
     type Mutation {
     register(name: String, username: String, email: String, password: String): User
-    login(email: String,password: String): Token
+    login(username: String,password: String): Token
   }
   `;
 
@@ -44,8 +44,8 @@ const resolvers = {
       return newUser
     },
     login: async (_, args) => {
-      const { email, password } = args;
-      const user = await UserModel.login(email, password);
+      const { username, password } = args;
+      const user = await UserModel.login(username, password);
       return user;
     },
   },

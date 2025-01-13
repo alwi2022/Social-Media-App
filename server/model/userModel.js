@@ -48,31 +48,30 @@ class UserModel {
       throw new Error("min length password is 5");
     }
     newUser.password = hashPass(newUser.password);
-    console.log(newUser, "ini newusre`");
 
     return this.collection().insertOne(newUser);
   }
 
-  static async login(email, password) {
-    if (!email) {
-      throw new Error("Email is required");
+  static async login(username, password) {
+    if (!username) {
+      throw new Error("Username is required");
     }
     if (!password) {
-      throw new Error("Email is required");
+      throw new Error("Username is required");
     }
 
-    const user = await this.collection().findOne({ email });
+    const user = await this.collection().findOne({ username });
 
     if (!user) {
-      throw new Error("Invalid email password");
+      throw new Error("Invalid username/password");
     }
 
     const compare = comparePass(password, user.password);
 
     if (!compare) {
-      throw new Error("Invalid email passowrd");
+      throw new Error("Invalid username/passowrd");
     }
-    const payload = { id: user._id, email: user.email };
+    const payload = { id: user._id, username: user.username};
 
     const token = signToken(payload);
 
