@@ -1,6 +1,4 @@
 const postModel = require("../model/postModel");
-const UserModel = require("../model/userModel");
-
 const typeDefs = `#graphql
 type Post {
   _id: ID
@@ -41,11 +39,11 @@ const resolvers = {
            imgUrl,
            comments: [], 
            likes: [],    
-           createdAt: new Date().toISOString(),
-           updatedAt: new Date().toISOString()
+           createdAt: new Date().toString(),
+           updatedAt: new Date().toString()
          };
          const getIdPost = await postModel.addPost(newPost);
-         console.log(getIdPost,'ini id dari newpost'); //  insertedId: new ObjectId('6785235fba463bf21e7af354')
+        //  console.log(getIdPost,'ini id dari newpost'); //  insertedId: new ObjectId('6785235fba463bf21e7af354')
          
          newPost._id = getIdPost.insertedId
          return newPost;
