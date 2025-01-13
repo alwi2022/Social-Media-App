@@ -8,9 +8,18 @@ class UserModel {
     return database.collection("users");
   }
 
+ 
+
   static async register(newUser) {
-    console.log(newUser,'ini newuser id resiter model');
+    // console.log(newUser,'ini newuser id resiter model');
+    if(!newUser.email){
+        throw new Error("Email is required");
+    }
     
+    if(!newUser.password){
+        throw new Error("Password is required");
+    }
+
     const emailExist = await this.collection().findOne({
       email: newUser.email,
     });
@@ -22,9 +31,18 @@ class UserModel {
       throw new Error("Username must be unique");
     }
 
+    const emailformat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!emailformat.test(newUser.email)){
+        throw new Error("invalid email format");
+        
+    }
+
     if (emailExist) {
       throw new Error("Email must be unique");
     }
+
+    
 
     if (newUser.password.length < 5) {
       throw new Error("min length password is 5");
@@ -32,7 +50,7 @@ class UserModel {
     newUser.password = hashPass(newUser.password);
     console.log(newUser, "ini newusre`");
 
-    return  this.collection().insertOne(newUser);
+    return this.collection().insertOne(newUser);
   }
 
   static async login(email, password) {
