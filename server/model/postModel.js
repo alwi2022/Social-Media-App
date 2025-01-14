@@ -20,6 +20,11 @@ class postModel {
     const result = await this.collection().updateOne({_id: new ObjectId(String(postId))},{$push:{comments: comment}})
     return result
   }
+
+  static async addLike(postId,like){
+    const result = await this.collection().updateOne({_id: new ObjectId(String(postId))},{$push:{likes:like}})
+    return result
+  }
 }
 
 module.exports = postModel;

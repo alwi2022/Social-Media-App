@@ -100,6 +100,7 @@ const resolvers = {
         updatedAt: new Date()
       }
       await postModel.addLike(postId,like)
+      return "Liked"
     },
   },
 };
