@@ -33,15 +33,49 @@ class postModel {
       },
 
       {
-        $sort:{
-          createdAt: -1
-        }
+        $sort: {
+          createdAt: -1,
+        },
       },
     ];
     const result = await this.collection().aggregate(agg).toArray();
-    console.log(result,'ini result getpostALl');
-    
+    console.log(result, "ini result getpostALl");
+
     return result;
+  }
+
+  static async getPostById(_id) {
+    const agg = [
+      { $match: { _id: new ObjectId(String(_id)) } },
+      {
+        $addFields: {
+          authorId: { $toObjectId: "$authorId" }, 
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "authorId",
+          foreignField: "_id",
+          as: "authorDetail",
+        },
+      },
+      {
+        $unwind: {
+          path: "$authorDetail",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          "authorDetail.password": false,
+        },
+      },
+    ];
+    const result = await this.collection().aggregate(agg).toArray();
+    console.log(result, "ini");
+
+    return result[0];
   }
 
   static async addComent(postId, comment) {

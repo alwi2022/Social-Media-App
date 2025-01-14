@@ -20,8 +20,8 @@ const { verifyToken } = require("./helpers/jwt");
 const UserModel = require("./model/userModel");
 
 const server = new ApolloServer({
-  typeDefs: [typeDefsUser, typeDefsPost,typeDefsfollow],
-  resolvers: [resolversUser, resolversPost,resolversfollow],
+  typeDefs: [typeDefsUser, typeDefsPost, typeDefsfollow],
+  resolvers: [resolversUser, resolversPost, resolversfollow],
   introspection: true,
   //introspection:true untuk kemudahan pembacaan buat instruktor
 });
@@ -32,21 +32,17 @@ async function startServer() {
     context: ({ req, res }) => {
       return {
         authentication: async () => {
-          const  authorization  = req.headers.authorization
+          const authorization = req.headers.authorization;
           if (!authorization) throw new Error("Please login first");
 
-          const [type,token] = authorization.split(" ")
-          // console.log(token,'ini token');
-          
+          const [type, token] = authorization.split(" ");
+
           if (type !== "Bearer") throw new Error("Invalid token");
 
           const payload = verifyToken(token);
-          console.log(payload,'ini payload');
-          
+
           const user = await UserModel.findById(payload.id);
-          
-          
-          
+
           return user;
         },
       };

@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const redis = require("../config/ioRedis");
 const postModel = require("../model/postModel");
 const typeDefs = `#graphql
@@ -38,6 +39,7 @@ type Like{
 
 type Query {
   getPosts: [Post]
+  getPostsById(_id:ID): Post
 }
 
 type Mutation {
@@ -50,7 +52,7 @@ type Mutation {
 const resolvers = {
   Query: {
     getPosts: async (_, args, { authentication }) => {
-     await authentication();
+      await authentication();
 
       const postRedis = await redis.get("posts");
       if (postRedis) {
@@ -63,9 +65,13 @@ const resolvers = {
       return post;
     },
 
-    // getPostsById: async (_,args,{authentication}) =>{
-
-    // }
+    getPostsById: async (_, { _id },{authentication}) => {      
+      await authentication();
+      const post = await postModel.getPostById(_id);
+      console.log(post,'ini post di getpostbyid');
+      
+      return post;
+    },
   },
 
   Mutation: {
@@ -79,8 +85,8 @@ const resolvers = {
         imgUrl,
         comments: [],
         likes: [],
-        createdAt: new Date().toString(),
-        updatedAt: new Date().toString(),
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       const getIdPost = await postModel.addPost(newPost);
 
