@@ -8,15 +8,13 @@ class UserModel {
     return database.collection("users");
   }
 
- 
-
   static async register(newUser) {
-    if(!newUser.email){
-        throw new Error("Email is required");
+    if (!newUser.email) {
+      throw new Error("Email is required");
     }
-    
-    if(!newUser.password){
-        throw new Error("Password is required");
+
+    if (!newUser.password) {
+      throw new Error("Password is required");
     }
 
     const emailExist = await this.collection().findOne({
@@ -32,16 +30,13 @@ class UserModel {
 
     const emailformat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if(!emailformat.test(newUser.email)){
-        throw new Error("invalid email format");
-        
+    if (!emailformat.test(newUser.email)) {
+      throw new Error("invalid email format");
     }
 
     if (emailExist) {
       throw new Error("Email must be unique");
     }
-
-    
 
     if (newUser.password.length < 5) {
       throw new Error("min length password is 5");
@@ -70,7 +65,7 @@ class UserModel {
     if (!compare) {
       throw new Error("Invalid username/passowrd");
     }
-    const payload = { id: user._id};
+    const payload = { id: user._id };
 
     const token = signToken(payload);
 
@@ -79,11 +74,11 @@ class UserModel {
     };
   }
 
-  static async getUserById(_id) {
+  static async findById(_id) {
     const user = await this.collection().findOne({
-      _id: new ObjectId(_id),
+      _id: new ObjectId(String(_id)),
     });
-    
+
     return user;
   }
 }

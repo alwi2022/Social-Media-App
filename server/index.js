@@ -31,15 +31,16 @@ async function startServer() {
           if (!authorization) throw new Error("Please login first");
 
           const [type,token] = authorization.split(" ")
-          // console.log(token);
+          // console.log(token,'ini token');
           
           if (type !== "Bearer") throw new Error("Invalid token");
 
           const payload = verifyToken(token);
-          const user = await UserModel.getUserById(payload._id);
-          // console.log(payload);
+          console.log(payload,'ini payload');
           
-          // console.log(payload._id,'ini payload id di authentication',user,'ini user di authentication');
+          const user = await UserModel.findById(payload.id);
+          
+          
           
           return user;
         },

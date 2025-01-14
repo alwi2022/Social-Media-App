@@ -14,7 +14,7 @@ const typeDefs = `#graphql
   }
 
   type Query {
-        getUserById(id: ID): User
+        getUserById(_id: ID): User
     }
 
     type Mutation {
@@ -26,24 +26,18 @@ const typeDefs = `#graphql
 const resolvers = {
   Query: {
     getUserById: async (_, args) => {
-      const { _id } = args
-      const user = UserModel.getUserById( _id);
-      // console.log(user,'ini getuserbyid di schema');
-      
+      const { _id } = args;
+      const user = await UserModel.findById(_id);
       return user;
     },
   },
 
   Mutation: {
     register: async (_, args) => {
-      console.log(args,'ini args');
-      
       const { name, username, email, password } = args;
-      const newUser = {name, username, email, password};
-
+      const newUser = { name, username, email, password };
       await UserModel.register(newUser);
-
-      return newUser
+      return newUser;
     },
     login: async (_, args) => {
       const { username, password } = args;

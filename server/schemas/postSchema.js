@@ -1,3 +1,4 @@
+const redis = require("../config/ioRedis");
 const postModel = require("../model/postModel");
 const typeDefs = `#graphql
 type Post {
@@ -32,28 +33,35 @@ type Query {
 }
 
 type Mutation {
-    createPost(authorId: ID, content: String, tags: [String], imgUrl: String): Post
-    addComent(postId:ID, username:String,content:String): Comment
+    createPost(content: String, tags: [String], imgUrl: String): Post
+    addComent(postId:ID, content:String): Comment
+    addLike(postId:ID): String
 }
 `;
 
 const resolvers = {
   Query: {
-    getPosts: async (_,args,{authentication}) => {
-      await authentication()
+    getPosts: async (_, args, { authentication }) => {
+      await authentication();
+
+      const postRedis = await redis.get("posts");
+      if (postRedis) {
+        console.log(postRedis, "post from redis");
+        return JSON.parse(postRedis);
+      }
       const post = await postModel.getAllPosts();
-      console.log(post);
-      
+      redis.set("posts", JSON.stringify(post));
+      console.log(post, "post from mongodb");
       return post;
     },
   },
 
   Mutation: {
-    createPost: async (_, args,{authentication}) => {
-      await authentication()
-      const { authorId, content, tags, imgUrl } = args;
+    createPost: async (_, args, { authentication }) => {
+      const user = await authentication();
+      const { content, tags, imgUrl } = args;
       const newPost = {
-        authorId,
+        authorId: user._id,
         content,
         tags,
         imgUrl,
@@ -65,16 +73,33 @@ const resolvers = {
       const getIdPost = await postModel.addPost(newPost);
 
       newPost._id = getIdPost.insertedId;
+      redis.del("posts");
       return newPost;
     },
 
-    addComent: async (_, args,{authentication}) => {
-      await authentication()
-      const { postId, username, content } = args;
-      const comment = {username,content, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()}
-      await postModel.addComent(postId,comment)
+    addComent: async (_, args, { authentication }) => {
+      const user = await authentication();
+      const { postId, content } = args;
+      const comment = {
+        username: user.username,
+        content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      await postModel.addComent(postId, comment);
 
-      return comment
+      return comment;
+    },
+
+    addLike: async (_, args, { authentication }) => {
+      const user = await authentication();
+      const {postId} = args
+      const like = {
+        username: user.username,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+      await postModel.addLike(postId,like)
     },
   },
 };
