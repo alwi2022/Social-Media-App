@@ -7,7 +7,16 @@ const typeDefs = `#graphql
     name: String
     username: String
     email: String
+    followDetail: [FollowUser]
   }
+
+  type FollowUser{
+    username:String
+    email:String
+
+  }
+
+  
 
   type Token{
   access_token: String
@@ -15,6 +24,7 @@ const typeDefs = `#graphql
 
   type Query {
         getUserById(_id: ID): User
+        getUserByUserName(username:String): [User]
     }
 
     type Mutation {
@@ -29,6 +39,15 @@ const resolvers = {
       const { _id } = args;
       const user = await UserModel.findById(_id);
       return user;
+    },
+
+    getUserByUserName: async (_, args) => {
+      const { username } = args;
+      const result = await UserModel.getUsername(username);
+      if (!username) {
+        throw new Error("username is not found");
+      }
+      return result;
     },
   },
 

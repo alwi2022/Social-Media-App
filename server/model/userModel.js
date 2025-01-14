@@ -74,13 +74,49 @@ class UserModel {
     };
   }
 
-  static async findById(_id) {
-    const user = await this.collection().findOne({
-      _id: new ObjectId(String(_id)),
-    });
+  static async getUsername(username) {
+    const users = this.collection()
+      .find({
+        username: {
+          $regex: username || "",
+          $options: "i",
+        },
+      })
+      .toArray();
 
-    return user;
+    return users;
   }
+
+  static async findById(_id) {
+    const agg = [
+      {
+        $match: {
+          _id: new ObjectId(String(_id)), 
+        },
+      },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id", 
+          foreignField: "followerId",
+          as: "followDetails", 
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "followDetails.followingId", 
+          foreignField: "_id", 
+          as: "followDetail", 
+        },
+      },
+   
+    ];
+  
+    const result = await this.collection().aggregate(agg).toArray();
+    return result[0] || null;
+  }
+  
 }
 
 module.exports = UserModel;

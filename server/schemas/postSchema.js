@@ -11,6 +11,14 @@ type Post {
   likes: [Like]
   createdAt: String
   updatedAt: String
+  authorDetail: AuthorDetail
+}
+
+type AuthorDetail{
+  _id:ID
+  username: String
+  email: String
+  name: String
 }
 
 
@@ -42,7 +50,7 @@ type Mutation {
 const resolvers = {
   Query: {
     getPosts: async (_, args, { authentication }) => {
-      await authentication();
+     await authentication();
 
       const postRedis = await redis.get("posts");
       if (postRedis) {
@@ -54,6 +62,10 @@ const resolvers = {
       console.log(post, "post from mongodb");
       return post;
     },
+
+    // getPostsById: async (_,args,{authentication}) =>{
+
+    // }
   },
 
   Mutation: {
@@ -93,14 +105,14 @@ const resolvers = {
 
     addLike: async (_, args, { authentication }) => {
       const user = await authentication();
-      const {postId} = args
+      const { postId } = args;
       const like = {
         username: user.username,
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
-      await postModel.addLike(postId,like)
-      return "Liked"
+        updatedAt: new Date(),
+      };
+      await postModel.addLike(postId, like);
+      return "Liked";
     },
   },
 };

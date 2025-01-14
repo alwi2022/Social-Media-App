@@ -11,12 +11,17 @@ const {
   typeDefs: typeDefsUser,
   resolvers: resolversUser,
 } = require("./schemas/userSchema");
+const {
+  typeDefs: typeDefsfollow,
+  resolvers: resolversfollow,
+} = require("./schemas/follow");
+
 const { verifyToken } = require("./helpers/jwt");
 const UserModel = require("./model/userModel");
 
 const server = new ApolloServer({
-  typeDefs: [typeDefsUser, typeDefsPost],
-  resolvers: [resolversUser, resolversPost],
+  typeDefs: [typeDefsUser, typeDefsPost,typeDefsfollow],
+  resolvers: [resolversUser, resolversPost,resolversfollow],
   introspection: true,
   //introspection:true untuk kemudahan pembacaan buat instruktor
 });
