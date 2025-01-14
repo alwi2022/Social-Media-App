@@ -14,7 +14,7 @@ const typeDefs = `#graphql
   }
 
   type Query {
-        getUserById(id: ID!): User
+        getUserById(id: ID): User
     }
 
     type Mutation {
@@ -26,8 +26,10 @@ const typeDefs = `#graphql
 const resolvers = {
   Query: {
     getUserById: async (_, args) => {
-      const { _id } = args;
-      const user = UserModel.getUserById(_id);
+      const { _id } = args
+      const user = UserModel.getUserById( _id);
+      // console.log(user,'ini getuserbyid di schema');
+      
       return user;
     },
   },

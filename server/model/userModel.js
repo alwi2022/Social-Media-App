@@ -11,7 +11,6 @@ class UserModel {
  
 
   static async register(newUser) {
-    // console.log(newUser,'ini newuser id resiter model');
     if(!newUser.email){
         throw new Error("Email is required");
     }
@@ -82,8 +81,9 @@ class UserModel {
 
   static async getUserById(_id) {
     const user = await this.collection().findOne({
-      _id: new ObjectId(toString(id)),
+      _id: new ObjectId(_id),
     });
+    
     return user;
   }
 }
