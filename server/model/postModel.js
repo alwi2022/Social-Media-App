@@ -90,6 +90,8 @@ class postModel {
       _id: new ObjectId(String(postId)),
       likes: { $elemMatch: { username } },
     });
+    console.log(post,'ini check');
+    
     return !!post
   }
 
