@@ -24,8 +24,7 @@ const typeDefs = `#graphql
   type Query {
         getUserById(_id: ID): User
         getUserByUserName(username:String): [User]
-        following(followerId: ID): [FollowUser]
-        followers(followingId: ID): [FollowUser]
+     
     }
 
     type Mutation {
@@ -49,20 +48,6 @@ const resolvers = {
         throw new Error("username is not found");
       }
       return result;
-    },
-
-     // Dapatkan daftar pengguna yang diikuti
-     following: async (_, { followerId }, { authentication }) => {
-      await authentication();
-      const following = await UserModel.getFollowing(followerId);
-      return following;
-    },
-
-    // Dapatkan daftar pengguna yang menjadi follower
-    followers: async (_, { followingId }, { authentication }) => {
-      await authentication();
-      const followers = await UserModel.getFollowers(followingId);
-      return followers;
     },
   },
 

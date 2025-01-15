@@ -132,22 +132,7 @@ class UserModel {
     return result[0];
   }
 
-  static async getFollowing(followerId) {
-    const follower = await this.collection()
-      .find({ followerId: new ObjectId(String(followerId)) })
-      .toArray();
-    console.log(follower, "ion folower");
 
-    return follower;
-  }
-  static async getFollowers(followingId) {
-    const following = await this.collection()
-      .find({ followingId: new ObjectId(String(followingId)) })
-      .toArray();
-    console.log(following);
-
-    return following;
-  }
 }
 
 module.exports = UserModel;

@@ -73,7 +73,6 @@ class postModel {
       },
     ];
     const result = await this.collection().aggregate(agg).toArray();
-    console.log(result, "ini");
 
     return result[0];
   }
@@ -86,11 +85,26 @@ class postModel {
     return result;
   }
 
+  static async checkUserLike(postId, username) {
+    const post = await this.collection().findOne({
+      _id: new ObjectId(String(postId)),
+      likes: { $elemMatch: { username } },
+    });
+    return !!post
+  }
+
+  static async removeLike(postId, username) {
+    const result = await this.collection().updateOne(
+      { _id: new ObjectId(String(postId)) },
+      { $pull: { likes: { username } } } 
+    );
+    return result;
+  }
+
   static async addLike(postId, like) {
     const result = await this.collection().updateOne(
       { _id: new ObjectId(String(postId)) },
-      { $push: { likes: like } }
-    );
+      { $push: { likes: like } }    );
     return result;
   }
 }

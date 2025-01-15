@@ -112,13 +112,19 @@ const resolvers = {
     addLike: async (_, args, { authentication }) => {
       const user = await authentication();
       const { postId } = args;
-      const like = {
-        username: user.username,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await postModel.addLike(postId, like);
-      return "Liked";
+      const isLiked = await postModel.checkUserLike(postId, user.username);
+      if (isLiked) {
+        await postModel.removeLike(postId, user.username);
+        return "Unliked";
+      } else {
+        const like = {
+          username: user.username,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        await postModel.addLike(postId, like);
+        return "Liked";
+      }
     },
   },
 };
