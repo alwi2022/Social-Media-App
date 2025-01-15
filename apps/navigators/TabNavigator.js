@@ -11,12 +11,10 @@ export default function TabNavigator() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === "Beranda") {
+          if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Chat") {
-            iconName = focused
-              ? "chatbubble-ellipses-outline"
-              : "chatbubble-ellipses-outline";
+            iconName = focused ? "chatbubble-ellipses-outline": "chatbubble-ellipses-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           } else if (route.name === "Story") {
@@ -29,7 +27,7 @@ export default function TabNavigator() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Beranda" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Chat" component={ProfileScreen} />
       <Tab.Screen name="Story" component={ProfileScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

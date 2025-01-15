@@ -15,12 +15,12 @@ export default function Bookcard({ book }) {
             book.title
           )}?width=100&height=100&nologo=true`,
         }}
-        style={styles.image}
+        style={{ width: 100, height: 100, borderRadius: 8 }}
       />
-      <View style={styles.details}>
-        <Text style={styles.title}>{book.title}</Text>
-        <Text style={styles.author}>By: {book.author}</Text>
-        <Text style={styles.rating}>✨✨✨✨✨</Text>
+      <View style={{ flex: 1, marginLeft: 8 }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{book.title}</Text>
+        <Text style={{ fontSize: 14 }}>By: {book.author}</Text>
+        <Text style={{ marginTop: 4 }}>✨✨✨✨✨</Text>
       </View>
     </Pressable>
   );
@@ -32,18 +32,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     overflow: "hidden",
-    marginBottom: 8,
+    marginTop: 8,
+    marginBottom: 2,
     borderRadius: 10,
+    overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
     padding: 10,
   },
-  image: { width: 100, height: 100, borderRadius: 8 },
-  details: { flex: 1, marginLeft: 8 },
-  title: { fontSize: 16, fontWeight: "bold" },
-  author: { fontSize: 14, color: "#555" },
-  rating: { marginTop: 4, color: "#f4c542" },
 });
