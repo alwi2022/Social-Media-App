@@ -54,19 +54,21 @@ const resolvers = {
     getPosts: async (_, args, { authentication }) => {
       await authentication();
 
-      const postRedis = await redis.get("posts");
-      if (postRedis) {
-        console.log(postRedis, "post from redis");
-        return JSON.parse(postRedis);
-      }
+      // const postRedis = await redis.get("posts");
+      // if (postRedis) {
+      //   console.log(postRedis, "post from redis");
+      //   return JSON.parse(postRedis);
+      // }
       const post = await postModel.getAllPosts();
-      redis.set("posts", JSON.stringify(post));
-      console.log(post, "post from mongodb");
+      // redis.set("posts", JSON.stringify(post));
+      // console.log(post, "post from mongodb");
       return post;
     },
 
     getPostsById: async (_, { _id },{authentication}) => {      
       await authentication();
+      console.log(_id,'ini _id di getpostbyid');
+      
       const post = await postModel.getPostById(_id);
       console.log(post,'ini post di getpostbyid');
       
@@ -91,7 +93,7 @@ const resolvers = {
       const getIdPost = await postModel.addPost(newPost);
 
       newPost._id = getIdPost.insertedId;
-      redis.del("posts");
+      // redis.del("posts");
       return newPost;
     },
 
@@ -105,7 +107,7 @@ const resolvers = {
         updatedAt: new Date().toISOString(),
       };
       await postModel.addComent(postId, comment);
-      redis.del("posts");
+      // redis.del("posts");
       return comment;
     },
 
@@ -125,7 +127,7 @@ const resolvers = {
           updatedAt: new Date(),
         };
         await postModel.addLike(postId, like);
-        redis.del("posts");
+        // redis.del("posts");
         return "Liked";
       }
     },
