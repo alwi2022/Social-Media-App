@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 const ADD_COMMENT = gql`
   mutation AddComent($postId: ID, $content: String) {
@@ -45,18 +46,17 @@ export default function AddComment({ postId, refetch }) {
     <View style={{ padding: 10, paddingTop: 4 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         <TextInput
-          onChangeText={{ setComment }}
+          onChangeText={(text) => setComment(text)}
           value={comment}
           style={styles.input}
-        >
-          {loading && <ActivityIndicator size={"large"} color={"tomato"} />}
-
-          {loading && (
-            <Pressable onPress={handleSubmit}>
-              <Feather name="send" size={24} color="black" />
-            </Pressable>
-          )}
-        </TextInput>
+        />
+        {loading ? (
+          <ActivityIndicator size="large" color="tomato" />
+        ) : (
+          <Pressable onPress={handleSubmit}>
+            <Feather name="send" size={24} color="black" />
+          </Pressable>
+        )}
       </View>
     </View>
   );

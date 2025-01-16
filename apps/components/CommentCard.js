@@ -5,7 +5,9 @@ export default function CommentCard({ comment }) {
     <View style={{ flexDirection: "row", gap: 8 }}>
       <Image
         source={{
-          uri: `https://avatar.iran.liara.run/public/boy?username=${comment.username}`,
+          uri: comment.username
+      ? `https://avatar.iran.liara.run/public/boy?username=${comment.username}`
+      : "https://via.placeholder.com/150",
         }}
         style={{
           backgroundColor: "white",

@@ -21,8 +21,8 @@ const LOGIN = gql`
 `;
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setusername] = useState("username1");
+  const [password, setPassword] = useState("user1");
   const { setIsSignedIn } = useContext(AuthContext);
 
   const [login, { loading }] = useMutation(LOGIN);
@@ -30,7 +30,7 @@ export default function LoginScreen() {
     try {
       const result = await login({
         variables: {
-          email: email,
+          username: username,
           password: password,
         },
       });
@@ -55,13 +55,21 @@ export default function LoginScreen() {
             textAlign: "center",
           }}
         ></Text>
-        <FontAwesome5 name="line" size={24} color="black" /> BangLine
+        <FontAwesome5 name="line" size={24} color="green" /> 
       </View>
       <View>
-        <Text>Email</Text>
+        <Text>username</Text>
         <TextInput
-          onChangeText={setEmail}
-          value={email}
+          onChangeText={setusername}
+          value={username}
+          style={styles.input}
+        />
+      </View>
+      <View>
+        <Text>Password</Text>
+        <TextInput
+          onChangeText={setPassword}
+          value={password}
           style={styles.input}
           secureTextEntry={true}
         />
@@ -69,7 +77,7 @@ export default function LoginScreen() {
       {loading ? (
         <ActivityIndicator size={"large"} color={"green"} />
       ) : (
-        <Button title="Login" onPress={submitLogin} color={"#f4511e"} />
+        <Button title="Login" onPress={submitLogin} color={"#00C300"} />
       )}
     </View>
   );

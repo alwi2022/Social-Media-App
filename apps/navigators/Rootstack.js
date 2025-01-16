@@ -6,15 +6,33 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import * as SecureStore from "expo-secure-store";
+import { Text, View } from "react-native";
+import LoginScreen from "../screens/LoginScreen";
 
 const stack = createNativeStackNavigator();
 
 export default function RootStack() {
   const { isSignedIn, setIsSignedIn } = useContext(AuthContext);
 
- 
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const checkLogin = async () => {
+      const token = await SecureStore.getItemAsync("access_Token");
+      if (token) {
+        setIsSignedIn(true);
+      }
+      setLoading(false);
+    };
+    checkLogin();
+  }, []);
 
-
+  if (loading)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
     <>
@@ -31,7 +49,7 @@ export default function RootStack() {
           headerShown: true,
         }}
       >
-       
+        {isSignedIn ? (
           <>
             <stack.Screen
               name="Home"
@@ -54,8 +72,11 @@ export default function RootStack() {
               options={{ title: "Profile" }}
             />
           </>
-      
-       
+        ) : (
+          <>
+            <stack.Screen name="Login" component={LoginScreen} />
+          </>
+        )}
       </stack.Navigator>
     </>
   );

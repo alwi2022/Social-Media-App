@@ -45,9 +45,9 @@ const GET_POST_ID = gql`
 export default function DetailScreen({ route }) {
   const { _id } = route.params;
 
-  const { data, refatch, loading } = useQuery(GET_POST_ID, {
-    variables: { id: _id },
-  });
+const { data, refetch, loading } = useQuery(GET_POST_ID, {
+  variables: { id: _id },
+});
 
   if (loading)
     return (
@@ -99,7 +99,7 @@ export default function DetailScreen({ route }) {
           </View>
         </View>
       </ScrollView>
-      <AddComment postId={data?.GetPostsById?._id} refatch={refatch}/>
+      <AddComment postId={data?.GetPostsById?._id} refetch={refetch}/>
     </View>
   );
 }
