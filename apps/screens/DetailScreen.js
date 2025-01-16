@@ -11,7 +11,7 @@ export default function DetailScreen({ route }) {
       <Button
         title="Go to Profile"
         onPress={() => navigation.navigate("Profile")}
-        color="#0D8ABC"
+        color="#00C300"
       />
     </View>
   );

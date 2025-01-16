@@ -13,8 +13,8 @@ export default function TabNavigator() {
           let iconName;
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Chat") {
-            iconName = focused ? "chatbubble-ellipses-outline": "chatbubble-ellipses-outline";
+          } else if (route.name === "Search") {
+            iconName = focused ? "search": "search-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           } else if (route.name === "Story") {
@@ -22,13 +22,13 @@ export default function TabNavigator() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "green",
+        tabBarActiveTintColor: "#00C300",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Chat" component={ProfileScreen} />
+      <Tab.Screen name="Search" component={ProfileScreen} />
       <Tab.Screen name="Story" component={ProfileScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
