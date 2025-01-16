@@ -1,23 +1,17 @@
-import { Image, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 export default function CommentCard({ comment }) {
   return (
     <View style={{ flexDirection: "row", gap: 8 }}>
       <Image
         source={{
-          uri: comment.username
-      ? `https://avatar.iran.liara.run/public/boy?username=${comment.username}`
-      : "https://via.placeholder.com/150",
+          uri: `https://avatar.iran.liara.run/public/boy?username=${comment.username}`,
         }}
         style={{
-          backgroundColor: "white",
-          paddingVertical: 4,
-          paddingHorizontal: 8,
-          minWidth: 100,
-          borderTopLeftRadius: 0,
-          flex: 1,
-          flexDirection: "row",
-          justifyContent: "space-between",
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: "lightgray",
         }}
       />
 

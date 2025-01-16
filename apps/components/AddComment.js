@@ -39,7 +39,7 @@ export default function AddComment({ postId, refetch }) {
       setComment("");
       await refetch();
     } catch (error) {
-      console.log(error.message);
+      Alert.alert("Error adding comment", error.message);
     }
   };
   return (

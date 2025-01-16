@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import {
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -11,58 +10,49 @@ import {
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
 
-const GET_POST_ID = gql`
+const GET_POST_BY_ID = gql`
   query GetPostsById($id: ID) {
     getPostsById(_id: $id) {
       _id
-      authorId
       content
-      tags
       imgUrl
-      createdAt
-      updatedAt
       authorDetail {
-        _id
         username
-        email
         name
       }
       comments {
         username
         content
-        createdAt
-        updatedAt
       }
       likes {
         username
-        createdAt
-        updatedAt
       }
     }
   }
 `;
 
+
 export default function DetailScreen({ route }) {
-  const { _id } = route.params;
+  const { id } = route.params;
+  const {  data,refetch,loading, error } = useQuery(GET_POST_BY_ID, {
+    variables: { id },
+  });
 
-const { data, refetch, loading } = useQuery(GET_POST_ID, {
-  variables: { id: _id },
-});
-
-  if (loading)
+  if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text>loading......</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
+  }
 
-  const navigation = useNavigation();
+  if (error || !data?.getPostsById) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Error loading data or data not found</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, justifyContent: "space-between" }}>
@@ -70,12 +60,12 @@ const { data, refetch, loading } = useQuery(GET_POST_ID, {
         <View style={{ padding: 8 }}>
           <Image
             source={{
-              uri: `https://image.pollinations.ai/prompt/${data?.GetPostsById?.content}?width=100&height=100&nologo=true`,
+              uri: `${data.getPostsById.imgUrl}?width=100&height=100&nologo=true`,
             }}
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8,
+              width: "100%",
+              height: 200,
+              borderRadius: 8,
             }}
           />
           <View
@@ -88,21 +78,21 @@ const { data, refetch, loading } = useQuery(GET_POST_ID, {
             }}
           >
             <Text style={{ fontWeight: "bold" }}>
-              {data?.GetPostsById?.content}
+              {data.getPostsById.content}
             </Text>
-
-            {data?.GetPostsById?.authorDetail?.name}
-
-            {data?.GetPostsById.comments?.map((comment, idx) => {
-              return <CommentCard key={idx} comment={comment} />;
-            })}
+            <Text>{data.getPostsById.authorDetail?.username}</Text>
+            {data.getPostsById.comments?.map((comment, idx) => (
+              <CommentCard key={comment._id || idx} comment={comment} />
+            ))}
           </View>
         </View>
       </ScrollView>
-      <AddComment postId={data?.GetPostsById?._id} refetch={refetch}/>
+      <AddComment postId={data.getPostsById._id} refetch={refetch} />
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

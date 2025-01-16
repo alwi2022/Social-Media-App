@@ -1,27 +1,77 @@
-import { FlatList, StyleSheet, View } from "react-native";
-import Bookcard from "../components/Bookcard";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { gql, useQuery } from "@apollo/client";
+import Postcard from "../components/PostCard";
+const GET_POST = gql`
+  query GetPosts {
+    getPosts {
+      _id
+      authorId
+      content
+      tags
+      imgUrl
+      comments {
+        username
+        content
+        createdAt
+        updatedAt
+      }
+      likes {
+        username
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+      authorDetail {
+        _id
+        username
+        email
+        name
+      }
+    }
+  }
+`;
 
 export default function HomeScreen() {
-  const books = [
-    { title: "LINE Chat", author: "J.D. Salinger", price: 120000 },
-    { title: "LINE Cartoon", author: "Mustofa", price: 90000 },
-    { title: "LINE Story Tips", author: "Oda Nobunaga", price: 20000 },
-    { title: "LINE Stiker", author: "Sule", price: 1000 },
-    { title: "Emoticon Line", author: "Magnus Chase", price: 57000 },
-  ];
-  // <ScrollView style={styles.scrollView}>
+  const { loading, data, error } = useQuery(GET_POST);
+  console.log({ loading, data, error }, "ini data di homeeeeeee");
+
+  if (loading)
+    return (
+      <View
+        style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
+      >
+        <ActivityIndicator size={"large"} color={"tomato"} />
+        <Text>Loading...</Text>
+      </View>
+    );
+
+  if (error)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{error.message}</Text>
+      </View>
+    );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={books}
-        renderItem={({ item }) => <Bookcard book={item} />}
-        keyExtractor={(item, idx) => `${item.title}-${idx}`}
-        />
+    <View style={{ flex: 1 }}>
+    <FlatList
+  data={data?.getPosts}
+  renderItem={({ item }) => <Postcard posts={item} />}
+  keyExtractor={(item) => item._id} 
+/>
+
     </View>
   );
 }
-{/* </ScrollView> */}
+{
+}
 
 const styles = StyleSheet.create({
   container: {
