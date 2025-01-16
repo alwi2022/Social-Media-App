@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import * as SecureStore from "expo-secure-store";
 import {
   ActivityIndicator,
@@ -64,6 +64,7 @@ export default function RegisterScreen() {
       <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Text style={{ color: "green", fontWeight: "900", fontSize: 24 }}>
           Register
+        <FontAwesome5 name="line" size={24} color="green" />
         </Text>
       </View>
 
@@ -121,8 +122,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
-  footer: {
-    marginTop: 16,
-    alignItems: "center",
-  },
+
 });
