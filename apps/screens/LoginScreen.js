@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
 const LOGIN = gql`
   mutation Login($username: String, $password: String) {
     login(username: $username, password: $password) {
@@ -24,6 +25,7 @@ export default function LoginScreen() {
   const [username, setusername] = useState("username1");
   const [password, setPassword] = useState("user1");
   const { setIsSignedIn } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const [login, { loading }] = useMutation(LOGIN);
   const submitLogin = async () => {
@@ -45,17 +47,18 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={{ justifyContent: "center", flex: 1, padding: 10, gap: 8 }}>
-      <View>
+    <View style={{ flex: 1, justifyContent: "center", padding: 16 }}>
+      <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Text
           style={{
             color: "green",
             fontWeight: "900",
             fontSize: 24,
-            textAlign: "center",
           }}
-        ></Text>
-        <FontAwesome5 name="line" size={24} color="green" /> 
+        >
+          Login
+        <FontAwesome5 name="line" size={24} color="green"  /> 
+        </Text>
       </View>
       <View>
         <Text>username</Text>
@@ -79,15 +82,26 @@ export default function LoginScreen() {
       ) : (
         <Button title="Login" onPress={submitLogin} color={"#00C300"} />
       )}
+
+      <View style={styles.footer}>
+              <Text>Dont have an account?</Text>
+              <Button
+                title="Register"
+                onPress={() => navigation.navigate("Register")}
+                color="#00C300"
+              />
+            </View>
     </View>
+    
   );
 }
 
 const styles = StyleSheet.create({
-    input:{
-        height:40,
-        borderWidth:1,
-        padding:10,
-        borderRadius:4
-    }
+  input: {
+    height: 40,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
 })

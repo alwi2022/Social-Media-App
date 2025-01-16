@@ -9,6 +9,7 @@ import { AuthContext } from "../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import { Text, View } from "react-native";
 import LoginScreen from "../screens/LoginScreen";
+import RegisterScreen from "../screens/RegisterScreen";
 
 const stack = createNativeStackNavigator();
 
@@ -74,7 +75,8 @@ export default function RootStack() {
           </>
         ) : (
           <>
-            <stack.Screen name="Login" component={LoginScreen} />
+         <stack.Screen name="Login" component={LoginScreen} />
+         <stack.Screen name="Register" component={RegisterScreen} />
           </>
         )}
       </stack.Navigator>
