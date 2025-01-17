@@ -49,7 +49,7 @@ export default function SearchScreen() {
       const response = await followUser({ variables: { followingId } });
       Alert.alert("Follow successful:", response.data.follow)
     } catch (error) {
-      console.log(error);
+     Alert.alert(error.message)
       
     }
   };

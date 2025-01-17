@@ -42,7 +42,6 @@ export default function HomeScreen() {
   const { loading, data, error } = useQuery(GET_POST,{
     fetchPolicy:"network-only"
   });
-  // console.log({ loading, data, error }, "ini data di homeeeeeee");
 
   if (loading)
     return (
