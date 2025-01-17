@@ -61,12 +61,17 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-    <FlatList
-  data={data?.getPosts}
-  renderItem={({ item }) => <Postcard posts={item} />}
-  keyExtractor={(item) => item._id} 
-/>
-
+      <FlatList
+        data={data?.getPosts}
+        renderItem={({ item }) => <Postcard posts={item} />}
+        keyExtractor={(item) => item._id}
+        onRefresh={async () =>{
+          console.log("ini di homescreen masuk");
+          await refetch()
+          
+        }}
+        refreshing={loading}
+      />
     </View>
   );
 }

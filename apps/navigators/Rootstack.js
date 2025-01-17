@@ -10,6 +10,8 @@ import * as SecureStore from "expo-secure-store";
 import { Text, View } from "react-native";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import SearchScreen from "../screens/SearchScreen";
+import CreatePostScreen from "../screens/CreatePostScreen";
 
 const stack = createNativeStackNavigator();
 
@@ -72,11 +74,21 @@ export default function RootStack() {
               component={ProfileScreen}
               options={{ title: "Profile" }}
             />
+            <stack.Screen
+              name="Search"
+              component={SearchScreen}
+              options={{ title: "Search Users" }}
+            />
+            <stack.Screen
+              name="CreatePost"
+              component={CreatePostScreen}
+              options={{ title: "Create Post" }}
+            />
           </>
         ) : (
           <>
-         <stack.Screen name="Login" component={LoginScreen} />
-         <stack.Screen name="Register" component={RegisterScreen} />
+            <stack.Screen name="Login" component={LoginScreen} />
+            <stack.Screen name="Register" component={RegisterScreen} />
           </>
         )}
       </stack.Navigator>

@@ -57,7 +57,7 @@ export default function LoginScreen() {
           }}
         >
           Login
-        <FontAwesome5 name="line" size={24} color="green"  /> 
+          <FontAwesome5 name="line" size={24} color="green" />
         </Text>
       </View>
       <View>
@@ -84,15 +84,14 @@ export default function LoginScreen() {
       )}
 
       <View style={styles.footer}>
-              <Text>Dont have an account?</Text>
-              <Button
-                title="Register"
-                onPress={() => navigation.navigate("Register")}
-                color="#00C300"
-              />
-            </View>
+        <Text>Dont have an account?</Text>
+        <Button
+          title="Register"
+          onPress={() => navigation.navigate("Register")}
+          color="#00C300"
+        />
+      </View>
     </View>
-    
   );
 }
 
@@ -104,4 +103,4 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
-})
+});

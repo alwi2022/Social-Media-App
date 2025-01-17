@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
-
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import AntDesign from '@expo/vector-icons/AntDesign';
 const GET_POST_BY_ID = gql`
   query GetPostsById($id: ID) {
     getPostsById(_id: $id) {
@@ -46,10 +47,10 @@ export default function DetailScreen({ route }) {
     );
   }
 
-  if (error || !data?.getPostsById) {
+  if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Error loading data or data not found</Text>
+        <Text>{error.message}</Text>
       </View>
     );
   }
@@ -68,6 +69,12 @@ export default function DetailScreen({ route }) {
               borderRadius: 8,
             }}
           />
+           <View >
+        <AntDesign name="like2" size={24} color="black" />
+            <Text>{data.getPostsById.likes?.length}</Text>
+            <FontAwesome5 name="comment" size={24} color="black" />
+            <Text>{data.getPostsById.comments?.length}</Text>
+        </View>
           <View
             style={{
               gap: 8,
