@@ -39,8 +39,10 @@ const GET_POST = gql`
 `;
 
 export default function HomeScreen() {
-  const { loading, data, error } = useQuery(GET_POST);
-  console.log({ loading, data, error }, "ini data di homeeeeeee");
+  const { loading, data, error } = useQuery(GET_POST,{
+    fetchPolicy:"network-only"
+  });
+  // console.log({ loading, data, error }, "ini data di homeeeeeee");
 
   if (loading)
     return (
@@ -66,7 +68,7 @@ export default function HomeScreen() {
         renderItem={({ item }) => <Postcard posts={item} />}
         keyExtractor={(item) => item._id}
         onRefresh={async () =>{
-          console.log("ini di homescreen masuk");
+          // console.log("ini di homescreen masuk");
           await refetch()
           
         }}

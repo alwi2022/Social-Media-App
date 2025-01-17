@@ -1,16 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
-import { useNavigation } from "@react-navigation/native";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
 const GET_POST_BY_ID = gql`
   query GetPostsById($id: ID) {
     getPostsById(_id: $id) {
@@ -32,10 +25,9 @@ const GET_POST_BY_ID = gql`
   }
 `;
 
-
 export default function DetailScreen({ route }) {
   const { id } = route.params;
-  const {  data,refetch,loading, error } = useQuery(GET_POST_BY_ID, {
+  const { data, refetch, loading, error } = useQuery(GET_POST_BY_ID, {
     variables: { id },
   });
 
@@ -69,12 +61,29 @@ export default function DetailScreen({ route }) {
               borderRadius: 8,
             }}
           />
-           <View >
-        <AntDesign name="like2" size={24} color="black" />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 8,
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>{data.getPostsById.content}</Text>
+            {data.getPostsById.tags?.map((tag, idx) => (
+              <Text
+                key={idx}
+                style={{ fontSize: 14, marginRight: 6, color: "gray" }}>
+                {tag}
+              </Text>
+            ))}
+          </View>
+          <View>
+            <AntDesign name="like2" size={24} color="black" />
             <Text>{data.getPostsById.likes?.length}</Text>
             <FontAwesome5 name="comment" size={24} color="black" />
             <Text>{data.getPostsById.comments?.length}</Text>
-        </View>
+          </View>
+
           <View
             style={{
               gap: 8,
@@ -98,8 +107,6 @@ export default function DetailScreen({ route }) {
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {

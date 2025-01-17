@@ -4,7 +4,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 export default function Postcard({ posts }) {
   const navigation = useNavigation();
-  console.log(posts, "ini posts");
+  // console.log(posts, "ini posts");
 
   return (
     <Pressable
