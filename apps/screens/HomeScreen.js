@@ -39,8 +39,8 @@ const GET_POST = gql`
 `;
 
 export default function HomeScreen() {
-  const { loading, data, error } = useQuery(GET_POST,{
-    fetchPolicy:"network-only"
+  const { loading, data, error } = useQuery(GET_POST, {
+    fetchPolicy: "network-only",
   });
 
   if (loading)
@@ -66,10 +66,9 @@ export default function HomeScreen() {
         data={data?.getPosts}
         renderItem={({ item }) => <Postcard posts={item} />}
         keyExtractor={(item) => item._id}
-        onRefresh={async () =>{
+        onRefresh={async () => {
           // console.log("ini di homescreen masuk");
-          await refetch()
-          
+          await refetch();
         }}
         refreshing={loading}
       />

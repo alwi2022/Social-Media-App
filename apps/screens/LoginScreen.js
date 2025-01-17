@@ -17,6 +17,7 @@ const LOGIN = gql`
   mutation Login($username: String, $password: String) {
     login(username: $username, password: $password) {
       access_token
+      user_id 
     }
   }
 `;
@@ -36,11 +37,12 @@ export default function LoginScreen() {
           password: password,
         },
       });
+      const { access_token, user_id } = result.data.login;
+
+    await SecureStore.setItemAsync("access_token", access_token);
+    await SecureStore.setItemAsync("user_id", user_id);
       setIsSignedIn(true);
       console.log(result);
-
-      const access_token = result.data.login.access_token;
-      await SecureStore.setItemAsync("access_token", access_token);
     } catch (error) {
       Alert.alert(error.message);
     }

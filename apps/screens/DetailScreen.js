@@ -10,6 +10,7 @@ const GET_POST_BY_ID = gql`
       _id
       content
       imgUrl
+      tags 
       authorDetail {
         username
         name

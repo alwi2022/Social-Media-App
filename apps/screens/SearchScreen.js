@@ -23,12 +23,16 @@ const GET_USER_BY_USERNAME = gql`
 `;
 
 const FOLLOW_USER = gql`
- mutation Follow($followingId: ID) {
-  follow(followingId: $followingId)
-}
+  mutation Follow($followingId: ID) {
+    follow(followingId: $followingId)
+  }
 `;
 
-
+const UNFOLLOW_USER = gql`
+  mutation Unfollow($followingId: ID) {
+    unfollow(followingId: $followingId)
+  }
+`;
 
 export default function SearchScreen() {
   const [username, setUsername] = useState("");
@@ -40,20 +44,28 @@ export default function SearchScreen() {
     if (username.trim() === "") return;
     getUserByUserName({ variables: { username } });
   };
-  
 
   const [followUser] = useMutation(FOLLOW_USER);
 
   const handleFollow = async (followingId) => {
     try {
       const response = await followUser({ variables: { followingId } });
-      Alert.alert("Follow successful:", response.data.follow)
+      Alert.alert("Follow successful:", response.data.follow);
     } catch (error) {
-     Alert.alert(error.message)
-      
+      Alert.alert(error.message);
     }
   };
-  
+
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
+
+  const handleUnfollow = async (followingId) => {
+    try {
+      const response = await unfollowUser({ variables: { followingId } });
+      Alert.alert("Unfollow successful:", response.data.unfollow);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
@@ -84,12 +96,17 @@ export default function SearchScreen() {
               <Text style={styles.userName}>{item.name}</Text>
               <Text>Username: {item.username}</Text>
               <Text>Email: {item.email}</Text>
-
-              <View style={{ width: 100, marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: 10 }}>
                 <Button
-                  title="follow"
+                  title="Follow"
                   onPress={() => handleFollow(item._id)}
                   color="#00C300"
+                />
+                <View style={{ width: 10 }} />
+                <Button
+                  title="Unfollow"
+                  onPress={() => handleUnfollow(item._id)}
+                  color="red"
                 />
               </View>
             </View>
