@@ -21,7 +21,7 @@ export default function RootStack() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const checkLogin = async () => {
-      const token = await SecureStore.getItemAsync("access_Token");
+      const token = await SecureStore.getItemAsync("access_token");
       if (token) {
         setIsSignedIn(true);
       }

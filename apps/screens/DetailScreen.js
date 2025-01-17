@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
@@ -25,11 +25,31 @@ const GET_POST_BY_ID = gql`
   }
 `;
 
+const ADD_LIKE = gql`
+  mutation AddLike($postId: ID) {
+    addLike(postId: $postId)
+  }
+`;
+
 export default function DetailScreen({ route }) {
   const { id } = route.params;
   const { data, refetch, loading, error } = useQuery(GET_POST_BY_ID, {
     variables: { id },
   });
+
+  const [like] = useMutation(ADD_LIKE, {
+    refetchQueries: ["GetPosts"],
+  });
+
+  const handleLike = async (postId) => {
+    try {
+      const result = await like({
+        variables: { postId },
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -72,14 +92,15 @@ export default function DetailScreen({ route }) {
             {data.getPostsById.tags?.map((tag, idx) => (
               <Text
                 key={idx}
-                style={{ fontSize: 14, marginRight: 6, color: "gray" }}>
+                style={{ fontSize: 14, marginRight: 6, color: "gray" }}
+              >
                 {tag}
               </Text>
             ))}
           </View>
           <View>
-            <AntDesign name="like2" size={24} color="black" />
-            <Text>{data.getPostsById.likes?.length}</Text>
+          <AntDesign name="like2" size={24} color="blue" onPress={() => handleLike(data.getPostsById._id)} />
+          <Text>{data.getPostsById.likes?.length}</Text>
             <FontAwesome5 name="comment" size={24} color="black" />
             <Text>{data.getPostsById.comments?.length}</Text>
           </View>
