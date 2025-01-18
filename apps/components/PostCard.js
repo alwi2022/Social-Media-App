@@ -54,9 +54,9 @@ const handleLike = async (postId) =>{
           ))}
         </View>
         <View>
-          <AntDesign name="like2" size={24} color="blue" onPress={() => handleLike(posts._id)} />
+          <AntDesign name="like2" size={24} color={posts.likes?.length > 0 ? "blue" : 'black'} onPress={() => handleLike(posts._id)} />
           <Text>{posts.likes?.length}</Text>
-          <FontAwesome5 name="comment" size={24} color="black" />
+          <FontAwesome5 name="comment" size={24} color={posts.comments?.length > 0? "blue" : "black"} />
           <Text>{posts.comments?.length}</Text>
         </View>
       </View>

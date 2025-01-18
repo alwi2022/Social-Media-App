@@ -47,6 +47,7 @@ export default function DetailScreen({ route }) {
       const result = await like({
         variables: { postId },
       });
+      Alert.alert("Liked")
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -95,12 +96,12 @@ export default function DetailScreen({ route }) {
                 key={idx}
                 style={{ fontSize: 14, marginRight: 6, color: "gray" }}
               >
-                {tag}
+                 #{tag}
               </Text>
             ))}
           </View>
           <View>
-          <AntDesign name="like2" size={24} color="blue" onPress={() => handleLike(data.getPostsById._id)} />
+          <AntDesign name="like2" size={24} color={data.getPostsById.likes?.length > 0 ? "blue" : "black" } onPress={() => handleLike(data.getPostsById._id)} />
           <Text>{data.getPostsById.likes?.length}</Text>
             <FontAwesome5 name="comment" size={24} color="black" />
             <Text>{data.getPostsById.comments?.length}</Text>
