@@ -128,6 +128,7 @@ export default function ProfileScreen() {
         onPress={async () => {
           setIsSignedIn(false);
           await SecureStore.deleteItemAsync("access_token");
+             await SecureStore.deleteItemAsync("user_id");
         }}
         color="red"
       />
