@@ -100,10 +100,12 @@ export default function DetailScreen({ route }) {
               </Text>
             ))}
           </View>
+
+          
           <View>
           <AntDesign name="like2" size={24} color={data.getPostsById.likes?.length > 0 ? "blue" : "black" } onPress={() => handleLike(data.getPostsById._id)} />
           <Text>{data.getPostsById.likes?.length}</Text>
-            <FontAwesome5 name="comment" size={24} color="black" />
+            <FontAwesome5 name="comment" size={24} color={data.getPostsById.comments?.length > 0 ? "blue" : "black" } />
             <Text>{data.getPostsById.comments?.length}</Text>
           </View>
 
@@ -115,11 +117,7 @@ export default function DetailScreen({ route }) {
               borderTopWidth: 1,
               paddingTop: 8,
             }}
-          >
-            <Text style={{ fontWeight: "bold" }}>
-              {data.getPostsById.content}
-            </Text>
-            <Text>{data.getPostsById.authorDetail?.username}</Text>
+          >          
             {data.getPostsById.comments?.map((comment, idx) => (
               <CommentCard key={comment._id || idx} comment={comment} />
             ))}
