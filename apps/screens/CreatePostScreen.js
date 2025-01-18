@@ -41,7 +41,7 @@ export default function CreatePostScreen() {
       <View
         style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
       >
-        <ActivityIndicator size={"large"} color={"tomato"} />
+        <ActivityIndicator size={"large"} color={"green"} />
         <Text>Loading...</Text>
       </View>
     );

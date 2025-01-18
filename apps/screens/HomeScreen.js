@@ -43,22 +43,22 @@ export default function HomeScreen() {
     fetchPolicy: "network-only",
   });
 
-  if (loading)
+  if (loading) {
     return (
-      <View
-        style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
-      >
-        <ActivityIndicator size={"large"} color={"tomato"} />
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="green" />
         <Text>Loading...</Text>
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>{error.message}</Text>
+      <View style={styles.center}>
+        <Text>Error: {error.message}</Text>
       </View>
     );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -82,5 +82,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f4f4f4",
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
