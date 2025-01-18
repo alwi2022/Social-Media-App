@@ -56,7 +56,7 @@ export default function Postcard({ posts }) {
       >
         <Image
           source={{
-            uri: `https://avatar.iran.liara.run/public/boy?username=${posts.username}`,
+            uri: `https://avatar.iran.liara.run/public/boy?username=${posts.authorDetail?.username}`,
           }}
           style={{
             width: 40,

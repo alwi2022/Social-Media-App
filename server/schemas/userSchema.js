@@ -45,9 +45,7 @@ const resolvers = {
     getUserByUserName: async (_, args) => {
       const { username } = args;
       const result = await UserModel.getUsername(username);
-      if (!username) {
-        throw new Error("username is not found");
-      }
+    
       return result;
     },
   },

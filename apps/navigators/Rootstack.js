@@ -59,7 +59,7 @@ export default function RootStack() {
               component={TabNavigator}
               options={({ route }) => {
                 const routeName =
-                  getFocusedRouteNameFromRoute(route) ?? "Books";
+                  getFocusedRouteNameFromRoute(route) ?? "Home";
                 return { title: routeName };
               }}
             />

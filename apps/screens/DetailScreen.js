@@ -1,5 +1,11 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -10,7 +16,7 @@ const GET_POST_BY_ID = gql`
       _id
       content
       imgUrl
-      tags 
+      tags
       authorDetail {
         username
         name
@@ -55,7 +61,7 @@ export default function DetailScreen({ route }) {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-         <ActivityIndicator size="large" color="green" />
+        <ActivityIndicator size="large" color="green" />
         <Text>Loading...</Text>
       </View>
     );
@@ -71,43 +77,78 @@ export default function DetailScreen({ route }) {
 
   return (
     <View style={{ flex: 1, justifyContent: "space-between" }}>
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+      >
+        <Image
+          source={{
+            uri: `https://avatar.iran.liara.run/public/boy?username=${data.getPostsById?.authorDetail.username}`,
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: "lightgray",
+          }}
+        />
+        <Text style={{ fontWeight: "bold", fontSize: 16, marginLeft: 8 }}>
+          {data.getPostsById?.authorDetail.username}
+        </Text>
+      </View>
+
       <ScrollView>
         <View style={{ padding: 8 }}>
-
-          <View style={{alignItems:'center',paddingTop:5, borderRadius:20}}>
-
-          <Image
-            source={{
-              uri: `${data.getPostsById.imgUrl}`,
-            }}
-            style={{
-              width: 300,
-              height: 300,
-              objectFit:"cover",
-              borderRadius: 8,
-              marginBottom: 16,
-            }}
+          <View
+            style={{ alignItems: "center", paddingTop: 5, borderRadius: 20 }}
+          >
+            <Image
+              source={{
+                uri: `${data.getPostsById.imgUrl}`,
+              }}
+              style={{
+                width: 300,
+                height: 300,
+                objectFit: "cover",
+                borderRadius: 8,
+                marginBottom: 16,
+              }}
             />
-            </View>
+          </View>
 
-            <View style={{alignItems:'center'}}>
+          <View style={{ alignItems: "center" }}>
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>
               {data.getPostsById.content}
             </Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                marginBottom: 8,
+              }}
+            >
               {data.getPostsById.tags?.map((tag, idx) => (
-                <Text key={idx} style={{ fontSize: 14, marginRight: 6, color: "gray" }}>
+                <Text
+                  key={idx}
+                  style={{ fontSize: 14, marginRight: 6, color: "gray" }}
+                >
                   #{tag}
                 </Text>
               ))}
             </View>
             <Text style={{ fontSize: 16, color: "gray", marginVertical: 8 }}>
-              Posted by: {data.getPostsById.authorDetail.name} 
+              Posted by: {data.getPostsById.authorDetail.name}
             </Text>
             <Text>Username: {data.getPostsById.authorDetail.username}</Text>
           </View>
-          
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 16, marginTop:10 }}>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 16,
+              marginTop: 10,
+            }}
+          >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <AntDesign
                 name="like2"
@@ -115,15 +156,21 @@ export default function DetailScreen({ route }) {
                 color={data.getPostsById.likes?.length > 0 ? "blue" : "black"}
                 onPress={() => handleLike(data.getPostsById._id)}
               />
-              <Text style={{ marginLeft: 6 }}>{data.getPostsById.likes?.length}</Text>
+              <Text style={{ marginLeft: 6 }}>
+                {data.getPostsById.likes?.length}
+              </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <FontAwesome5
                 name="comment"
                 size={24}
-                color={data.getPostsById.comments?.length > 0 ? "blue" : "black"}
+                color={
+                  data.getPostsById.comments?.length > 0 ? "blue" : "black"
+                }
               />
-              <Text style={{ marginLeft: 6 }}>{data.getPostsById.comments?.length}</Text>
+              <Text style={{ marginLeft: 6 }}>
+                {data.getPostsById.comments?.length}
+              </Text>
             </View>
           </View>
 
@@ -147,13 +194,3 @@ export default function DetailScreen({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-});

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import {
   Button,
   FlatList,
@@ -35,11 +35,10 @@ export default function ProfileScreen() {
   const { setIsSignedIn } = useContext(AuthContext);
 
   const userId = SecureStore.getItem("user_id");
-  console.log(userId, "ini usaer id");
 
-  const { data, loading, error,refetch  } = useQuery(GET_USER_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_BY_ID, {
     variables: { id: userId },
-     fetchPolicy: "network-only"
+    fetchPolicy: "network-only",
   });
 
   if (loading) {
@@ -60,45 +59,53 @@ export default function ProfileScreen() {
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
+      <View style={{width:100,marginLeft:'230'}}>
+        <Button
+        title="Logout"
+        onPress={async () => {
+          setIsSignedIn(false);
+          await SecureStore.deleteItemAsync("access_token");
+          await SecureStore.deleteItemAsync("user_id");
+        }}
+        color="red"
+      />
+
+      </View>
       <View style={styles.profileHeader}>
         <Image
           source={{
-            uri:
-              `https://avatar.iran.liara.run/public/boy?username=${data?.getUserById?.username}` ||
-              "https://via.placeholder.com/150",
+            uri: `https://avatar.iran.liara.run/public/boy?username=${data?.getUserById?.username}`,
           }}
-          style={{ width: 80,
-            height: 80,
-            borderRadius: 40,
-            marginBottom: 10,
-            backgroundColor: "lightgray",}}
+          style={styles.profileAvatar}
         />
         <Text style={styles.header}>{data?.getUserById?.name}</Text>
         <Text style={styles.info}>{data?.getUserById?.username}</Text>
         <Text style={styles.info}>{data?.getUserById?.email}</Text>
+        
+        
       </View>
 
       <Text style={styles.subHeader}>Followers:</Text>
-
       <FlatList
         data={data?.getUserById?.followers}
-        keyExtractor={(item) => item.username }
+        keyExtractor={(item) => item.username}
         onRefresh={async () => {
           await refetch();
         }}
         refreshing={loading}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.horizontalList}
         renderItem={({ item }) => (
           <View style={styles.card}>
-                <Image
+            <Image
               source={{
-                uri:
-                  `https://avatar.iran.liara.run/public/boy?username=${item?.username}` ||
-                  "https://via.placeholder.com/150",
+                uri: `https://avatar.iran.liara.run/public/boy?username=${item?.username}`,
               }}
               style={styles.avatar}
             />
-            <Text style={styles.cardText}>Username: {item.username}</Text>
-            <Text style={styles.cardText}>Email: {item.email}</Text>
+            <Text style={styles.cardText}>{item.username}</Text>
+            <Text style={styles.cardText}>{item.email}</Text>
           </View>
         )}
       />
@@ -106,36 +113,29 @@ export default function ProfileScreen() {
       <Text style={styles.subHeader}>Following:</Text>
       <FlatList
         data={data?.getUserById?.following}
-        keyExtractor={(item) => item.username }
+        keyExtractor={(item) => item.username}
         onRefresh={async () => {
           await refetch();
         }}
         refreshing={loading}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.horizontalList}
         renderItem={({ item }) => (
           <View style={styles.card}>
-                <Image
+            <Image
               source={{
-                uri:
-                  `https://avatar.iran.liara.run/public/boy?username=${item?.username}` ||
-                  "https://via.placeholder.com/150",
+                uri: `https://avatar.iran.liara.run/public/boy?username=${item?.username}`,
               }}
               style={styles.avatar}
             />
-            <Text style={styles.cardText}>Username: {item.username}</Text>
-            <Text style={styles.cardText}>Email: {item.email}</Text>
+            <Text style={styles.cardText}>{item.username}</Text>
+            <Text style={styles.cardText}>{item.email}</Text>
           </View>
         )}
       />
 
-      <Button
-        title="Logout"
-        onPress={async () => {
-          setIsSignedIn(false);
-          await SecureStore.deleteItemAsync("access_token");
-             await SecureStore.deleteItemAsync("user_id");
-        }}
-        color="red"
-      />
+    
     </View>
   );
 }
@@ -150,9 +150,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  avatar: {
-    width: 20,
-    height: 20,
+  profileAvatar: {
+    width: 60,
+    height: 60,
     borderRadius: 40,
     marginBottom: 10,
     backgroundColor: "lightgray",
@@ -172,13 +172,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 4,
   },
+  horizontalList: {
+    paddingVertical: 10,
+  },
   card: {
     backgroundColor: "#f8f8f8",
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
+    marginHorizontal: 8,
+    alignItems: "center",
+    width: 120,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginBottom: 8,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: 12,
+    textAlign: "center",
   },
 });
