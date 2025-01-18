@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 
@@ -28,16 +29,13 @@ const FOLLOW_USER = gql`
   }
 `;
 
-const UNFOLLOW_USER = gql`
-  mutation Unfollow($followingId: ID) {
-    unfollow(followingId: $followingId)
-  }
-`;
+
 
 export default function SearchScreen() {
   const [username, setUsername] = useState("");
 
-  const [getUserByUserName, { loading, data, error }] =
+  const [followUser] = useMutation(FOLLOW_USER);
+  const [getUserByUserName, { loading, data, error,refetch }] =
     useLazyQuery(GET_USER_BY_USERNAME);
 
   const handleSearch = () => {
@@ -45,27 +43,39 @@ export default function SearchScreen() {
     getUserByUserName({ variables: { username } });
   };
 
-  const [followUser] = useMutation(FOLLOW_USER);
 
   const handleFollow = async (followingId) => {
     try {
       const response = await followUser({ variables: { followingId } });
-      Alert.alert("Follow successful:", response.data.follow);
+      if(response.data.follow === "follow"){
+        Alert.alert("Follow successful:", response.data.follow);
+      }else{
+        Alert.alert("Follow successful:", response.data.follow);
+      }
+      await refetch()
     } catch (error) {
       Alert.alert(error.message);
     }
   };
 
-  const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
-  const handleUnfollow = async (followingId) => {
-    try {
-      const response = await unfollowUser({ variables: { followingId } });
-      Alert.alert("Unfollow successful:", response.data.unfollow);
-    } catch (error) {
-      Alert.alert(error.message);
-    }
-  };
+ 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="green" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{error.message}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
@@ -103,11 +113,6 @@ export default function SearchScreen() {
                   color="#00C300"
                 />
                 <View style={{ width: 10 }} />
-                <Button
-                  title="Unfollow"
-                  onPress={() => handleUnfollow(item._id)}
-                  color="red"
-                />
               </View>
             </View>
           )}

@@ -6,11 +6,17 @@ class followModel {
     return database.collection("follows");
   }
 
-  static async create(newFollow) {
-    console.log(newFollow,'ini newfolow');
-    
-    newFollow.followingId = new ObjectId(String(newFollow.followingId));
+  static async checkUserFollow(followerId, followingId) {
+    const follow = await this.collection().findOne({
+      followerId: new ObjectId(String(followerId)),
+      followingId: new ObjectId(String(followingId)),
+    });
 
+    return !!follow
+  }
+
+  static async create(newFollow) {    
+    newFollow.followingId = new ObjectId(String(newFollow.followingId));
     return this.collection().insertOne(newFollow);
   }
 

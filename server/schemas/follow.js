@@ -25,24 +25,22 @@ const resolvers = {
         throw new Error("You cannot follow yourself");
       }
 
-      const newFollow = {
-        followingId,
-        followerId: user._id,
-      };
-      await followModel.create(newFollow);
+      const existingFollow = await followModel.checkUserFollow(
+        user._id,
+        followingId
+      );
 
-      return "Success follow user";
-    },
-
-
-    unfollow: async (_, { followingId }, { authentication }) => {
-      const user = await authentication();
-      const result = await followModel.delete(user._id, followingId);
-      if (result.deletedCount === 0) {
-        throw new Error("yourenot follow this user");
+      if (existingFollow) {
+        const result = await followModel.delete(user._id, followingId);
+        return "unfollow";
+      } else {
+        const newFollow = {
+          followingId,
+          followerId: user._id,
+        };
+        const result = await followModel.create(newFollow);
+        return "follow";
       }
-
-      return "Success unfollow user";
     },
   },
 };

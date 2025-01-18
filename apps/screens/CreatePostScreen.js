@@ -35,6 +35,24 @@ export default function CreatePostScreen() {
     refetchQueries: ["GetPosts"],
   });
 
+
+  if (loading)
+    return (
+      <View
+        style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
+      >
+        <ActivityIndicator size={"large"} color={"tomato"} />
+        <Text>Loading...</Text>
+      </View>
+    );
+
+  if (error)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{error.message}</Text>
+      </View>
+    );
+
   const handleCreatePost = async () => {
     try {
       const newPost = {

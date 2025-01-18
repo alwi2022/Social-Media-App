@@ -37,7 +37,7 @@ export default function ProfileScreen() {
   const userId = SecureStore.getItem("user_id");
   console.log(userId, "ini usaer id");
 
-  const { data, loading, error } = useQuery(GET_USER_BY_ID, {
+  const { data, loading, error,refetch  } = useQuery(GET_USER_BY_ID, {
     variables: { id: userId },
      fetchPolicy: "network-only"
   });

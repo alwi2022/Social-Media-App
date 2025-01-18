@@ -47,7 +47,6 @@ export default function DetailScreen({ route }) {
       const result = await like({
         variables: { postId },
       });
-      Alert.alert("Liked")
     } catch (error) {
       Alert.alert(error.message);
     }
