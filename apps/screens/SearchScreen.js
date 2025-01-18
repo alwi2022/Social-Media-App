@@ -50,7 +50,7 @@ export default function SearchScreen() {
       if(response.data.follow === "follow"){
         Alert.alert("Follow successful:", response.data.follow);
       }else{
-        Alert.alert("Follow successful:", response.data.follow);
+        Alert.alert("Unfollow successful:", response.data.follow);
       }
       await refetch()
     } catch (error) {
