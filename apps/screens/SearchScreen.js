@@ -29,40 +29,37 @@ const FOLLOW_USER = gql`
   }
 `;
 
-
-
 export default function SearchScreen() {
   const [username, setUsername] = useState("");
 
   const [followUser] = useMutation(FOLLOW_USER);
-  const [getUserByUserName, { loading, data, error,refetch }] =
-    useLazyQuery(GET_USER_BY_USERNAME);
+  const [search, { loading, data, error, refetch }] = useLazyQuery(
+    GET_USER_BY_USERNAME
+  );
 
-  const handleSearch = () => {
-    if (username.trim() === "") return;
-    getUserByUserName({ variables: { username } });
+  const handleSearch = async () => {
+    const response = await search({ variables: { username } });
+    console.log(response);
+    return response;
   };
-
 
   const handleFollow = async (followingId) => {
     try {
       const response = await followUser({ variables: { followingId } });
-      if(response.data.follow === "follow"){
+      if (response.data.follow === "follow") {
         Alert.alert("Follow successful:", response.data.follow);
-      }else{
+      } else {
         Alert.alert("Unfollow successful:", response.data.follow);
       }
-      await refetch()
+      await refetch();
     } catch (error) {
       Alert.alert(error.message);
     }
   };
 
-
- 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.center}>
         <ActivityIndicator size="large" color="green" />
         <Text>Loading...</Text>
       </View>
@@ -71,58 +68,78 @@ export default function SearchScreen() {
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.center}>
         <Text>{error.message}</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <Button title="Search" color="#00C300" onPress={handleSearch} />
-      {data && data.getUserByUserName && (
+   
+      <View style={{ flex: 1, padding: 20 }}>
+        <TextInput
+          style={styles.input}
+          placeholder="Search by username"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <View>
+          {loading ? (
+            <ActivityIndicator size={"large"} color={"green"} />
+          ) : (
+            <Button title="Search" color="#00C300" onPress={handleSearch} />
+          )}
+        </View>
+
         <FlatList
-          data={data.getUserByUserName}
+          data={data?.getUserByUserName}
           keyExtractor={(item) => item._id}
+          contentContainerStyle={{ paddingBottom: 20 }} 
           renderItem={({ item }) => (
             <View style={styles.userCard}>
-              <Image
-                source={{
-                  uri: `https://avatar.iran.liara.run/public/boy?username=${item.username}`,
-                }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "lightgray",
-                }}
-              />
-              <Text style={styles.userName}>{item.name}</Text>
-              <Text>Username: {item.username}</Text>
-              <Text>Email: {item.email}</Text>
-              <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <View style={{  flexDirection: "row",
+    alignItems: "center",}}>
+                <Image
+                  source={{
+                    uri: `https://avatar.iran.liara.run/public/boy?username=${item.username}`,
+                  }}
+                  style={{ width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "lightgray",
+                    marginRight: 10,}}
+                />
+                <View style={{flex: 1,}}>
+                  <Text style={{ fontWeight: "bold",
+    fontSize: 16,}}>{item.name}</Text>
+                  <Text style={{ fontSize: 14,
+    color: "gray",}}>
+                    Username: {item.username}
+                  </Text>
+                  <Text style={styles.userDetails}>Email: {item.email}</Text>
+                </View>
+              </View>
+
+              <View style={{ marginTop: 10,}}>
                 <Button
                   title="Follow"
                   onPress={() => handleFollow(item._id)}
                   color="#00C300"
                 />
-                <View style={{ width: 10 }} />
               </View>
             </View>
           )}
         />
-      )}
-    </View>
+      </View>
   );
 }
 
 const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   input: {
     borderWidth: 1,
     marginBottom: 10,
@@ -139,9 +156,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
-  },
-  userName: {
-    fontWeight: "bold",
-    fontSize: 16,
   },
 });

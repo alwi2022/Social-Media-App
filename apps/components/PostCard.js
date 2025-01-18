@@ -10,6 +10,7 @@ const ADD_LIKE = gql`
     addLike(postId: $postId)
   }
 `;
+
 const formatRelativeDate = (dateString) => {
   const timestamp = Number(dateString);
   const date = isNaN(timestamp) ? null : new Date(timestamp);
@@ -18,7 +19,6 @@ const formatRelativeDate = (dateString) => {
   }
   return formatDistanceToNow(date, { addSuffix: true });
 };
-``;
 
 export default function Postcard({ posts }) {
   const navigation = useNavigation();
@@ -40,7 +40,7 @@ export default function Postcard({ posts }) {
   return (
     <View
       style={{
-        backgroundColor: "white",
+        backgroundColor: "#fff",
         borderRadius: 10,
         marginVertical: 8,
         padding: 10,
@@ -48,42 +48,59 @@ export default function Postcard({ posts }) {
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 3,
+        backgroundColor: "#f0f0f0",
       }}
     >
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+      >
+        <Image
+          source={{
+            uri: `https://avatar.iran.liara.run/public/boy?username=${posts.username}`,
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: "lightgray",
+          }}
+        />
+        <Text style={{ fontWeight: "bold", fontSize: 16, marginLeft: 8 }}>
+          {posts.authorDetail?.username}
+        </Text>
+      </View>
+
       <Pressable
         onPress={() =>
           navigation.navigate("Details", { id: posts._id, name: posts.content })
         }
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
       >
         <Image
           source={{ uri: posts.imgUrl }}
-          style={{ width: 300, height: 200, borderRadius: 10, marginTop: 20,objectFit:'cover' }}
+          style={{
+            width: "100%",
+            height: 300,
+            borderRadius: 10,
+            marginTop: 10,
+            objectFit: "cover",
+          }}
         />
       </Pressable>
 
       <View style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
         <Text
           style={{
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: "bold",
             marginBottom: 10,
-            textAlign: "center",
+            textAlign: "left",
           }}
         >
           {posts.content}
         </Text>
+
         <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            marginBottom: 10,
-          }}
+          style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 10 }}
         >
           {posts.tags?.map((tag, idx) => (
             <Text
@@ -94,49 +111,47 @@ export default function Postcard({ posts }) {
             </Text>
           ))}
         </View>
+
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-around",
+            justifyContent: "space-between",
             alignItems: "center",
-            marginTop: 20,
+            marginTop: 10,
           }}
         >
           <Pressable
             onPress={() => handleLike(posts._id)}
             disabled={loading}
-            style={{ flexDirection: "row", alignItems: "center" }}
+            style={{ flexDirection: "row" }}
           >
             <AntDesign
               name="like2"
               size={24}
               color={posts.likes?.length > 0 ? "blue" : "black"}
             />
-            <Text style={{ fontSize: 14, marginLeft: 4 }}>
+            <Text style={{ marginLeft: 4, fontSize: 14 }}>
               {posts.likes?.length}
             </Text>
           </Pressable>
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ alignItems: "center" }}>
             <FontAwesome5
               name="comment"
               size={24}
               color={posts.comments?.length > 0 ? "blue" : "black"}
             />
-            <Text style={{ marginLeft: 4, fontSize: 14 }}>
+            <Text style={{ fontSize: 14, marginLeft: 4 }}>
               {posts.comments?.length}
             </Text>
           </View>
         </View>
       </View>
-      <Text
-        style={{
-          fontSize: 13,
-          color: "black",
-          position: "absolute",
-          right: 10,
-        }}
-      >
+
+      <Text style={{fontSize: 12,
+    color: "gray",
+    marginTop: 10,
+    textAlign: "right",}}>
         Posted: {formatRelativeDate(posts.createdAt)}
       </Text>
     </View>
