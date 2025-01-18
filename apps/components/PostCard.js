@@ -3,12 +3,18 @@ import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { gql, useMutation } from "@apollo/client";
+import { formatDistanceToNow } from "date-fns";
 
 const ADD_LIKE = gql`
   mutation AddLike($postId: ID) {
     addLike(postId: $postId)
   }
 `;
+
+const formatRelativeDate = (dateString) => {
+  const date = new Date(dateString);
+  return formatDistanceToNow(date, { addSuffix: true });
+};
 
 export default function Postcard({ posts }) {
   const navigation = useNavigation();
@@ -52,7 +58,7 @@ export default function Postcard({ posts }) {
       >
         <Image
           source={{ uri: posts.imgUrl }}
-          style={{ width: 200, height: 200, borderRadius: 10 }}
+          style={{ width: 200, height: 200, borderRadius: 10 ,marginTop:20 }}
         />
       </Pressable>
 
@@ -119,6 +125,15 @@ export default function Postcard({ posts }) {
           </View>
         </View>
       </View>
+      <Text
+          style={{
+            fontSize: 13,
+            color: "black",
+            position: "absolute", 
+            right: 10, 
+          }}>
+          Posted: {formatRelativeDate(posts.createdAt)}
+        </Text>
     </View>
   );
 }
