@@ -13,6 +13,7 @@ type Follow {
 
 type Mutation{
     follow(followingId: ID): String
+    unfollow(followingId: ID): String
 }
 `;
 
@@ -31,6 +32,17 @@ const resolvers = {
       await followModel.create(newFollow);
 
       return "Success follow user";
+    },
+
+
+    unfollow: async (_, { followingId }, { authentication }) => {
+      const user = await authentication();
+      const result = await followModel.delete(user._id, followingId);
+      if (result.deletedCount === 0) {
+        throw new Error("yourenot follow this user");
+      }
+
+      return "Success unfollow user";
     },
   },
 };

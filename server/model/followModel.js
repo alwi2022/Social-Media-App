@@ -13,6 +13,13 @@ class followModel {
 
     return this.collection().insertOne(newFollow);
   }
+
+  static async delete(followerId, followingId) {
+    return this.collection().deleteOne({
+      followerId: new ObjectId(String(followerId)),
+      followingId: new ObjectId(String(followingId)),
+    });
+  }
 }
 
 module.exports = followModel;

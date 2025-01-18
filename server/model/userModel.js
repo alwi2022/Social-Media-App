@@ -71,6 +71,7 @@ class UserModel {
 
     return {
       access_token: token,
+      user_id: user._id,
     };
   }
 

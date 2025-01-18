@@ -19,6 +19,7 @@ const typeDefs = `#graphql
 
   type Token{
   access_token: String
+  user_id: ID,
   }
 
   type Query {
@@ -61,6 +62,8 @@ const resolvers = {
     login: async (_, args) => {
       const { username, password } = args;
       const user = await UserModel.login(username, password);
+      console.log(user,'ini user');
+      
       return user;
     },
   },
