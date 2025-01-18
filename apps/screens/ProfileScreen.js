@@ -67,7 +67,11 @@ export default function ProfileScreen() {
               `https://avatar.iran.liara.run/public/boy?username=${data?.getUserById?.username}` ||
               "https://via.placeholder.com/150",
           }}
-          style={styles.avatar}
+          style={{ width: 80,
+            height: 80,
+            borderRadius: 40,
+            marginBottom: 10,
+            backgroundColor: "lightgray",}}
         />
         <Text style={styles.header}>{data?.getUserById?.name}</Text>
         <Text style={styles.info}>{data?.getUserById?.username}</Text>
@@ -147,8 +151,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   avatar: {
-    width: 80,
-    height: 80,
+    width: 20,
+    height: 20,
     borderRadius: 40,
     marginBottom: 10,
     backgroundColor: "lightgray",

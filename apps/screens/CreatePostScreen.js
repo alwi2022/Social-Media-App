@@ -57,7 +57,7 @@ export default function CreatePostScreen() {
     try {
       const newPost = {
         content,
-        tags: tags.split(", ").map((el) => el.trim()),
+        tags: tags.split(",").map((el) => el.trim()),
         imgUrl,
       };
 

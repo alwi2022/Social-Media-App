@@ -1,5 +1,5 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import AddComment from "../components/AddComment";
 import CommentCard from "../components/CommentCard";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -55,6 +55,7 @@ export default function DetailScreen({ route }) {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+         <ActivityIndicator size="large" color="green" />
         <Text>Loading...</Text>
       </View>
     );
@@ -72,40 +73,58 @@ export default function DetailScreen({ route }) {
     <View style={{ flex: 1, justifyContent: "space-between" }}>
       <ScrollView>
         <View style={{ padding: 8 }}>
+
+          <View style={{alignItems:'center',paddingTop:5, borderRadius:20}}>
+
           <Image
             source={{
-              uri: `${data.getPostsById.imgUrl}?width=100&height=100&nologo=true`,
+              uri: `${data.getPostsById.imgUrl}`,
             }}
             style={{
-              width: "100%",
-              height: 200,
+              width: 300,
+              height: 300,
+              objectFit:"cover",
               borderRadius: 8,
+              marginBottom: 16,
             }}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8,
-            }}
-          >
-            <Text style={{ fontSize: 20 }}>{data.getPostsById.content}</Text>
-            {data.getPostsById.tags?.map((tag, idx) => (
-              <Text
-                key={idx}
-                style={{ fontSize: 14, marginRight: 6, color: "gray" }}
-              >
-                 #{tag}
-              </Text>
-            ))}
-          </View>
+            />
+            </View>
 
+            <View style={{alignItems:'center'}}>
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              {data.getPostsById.content}
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
+              {data.getPostsById.tags?.map((tag, idx) => (
+                <Text key={idx} style={{ fontSize: 14, marginRight: 6, color: "gray" }}>
+                  #{tag}
+                </Text>
+              ))}
+            </View>
+            <Text style={{ fontSize: 16, color: "gray", marginVertical: 8 }}>
+              Posted by: {data.getPostsById.authorDetail.name} 
+            </Text>
+            <Text>Username: {data.getPostsById.authorDetail.username}</Text>
+          </View>
           
-          <View>
-          <AntDesign name="like2" size={24} color={data.getPostsById.likes?.length > 0 ? "blue" : "black" } onPress={() => handleLike(data.getPostsById._id)} />
-          <Text>{data.getPostsById.likes?.length}</Text>
-            <FontAwesome5 name="comment" size={24} color={data.getPostsById.comments?.length > 0 ? "blue" : "black" } />
-            <Text>{data.getPostsById.comments?.length}</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 16, marginTop:10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <AntDesign
+                name="like2"
+                size={24}
+                color={data.getPostsById.likes?.length > 0 ? "blue" : "black"}
+                onPress={() => handleLike(data.getPostsById._id)}
+              />
+              <Text style={{ marginLeft: 6 }}>{data.getPostsById.likes?.length}</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <FontAwesome5
+                name="comment"
+                size={24}
+                color={data.getPostsById.comments?.length > 0 ? "blue" : "black"}
+              />
+              <Text style={{ marginLeft: 6 }}>{data.getPostsById.comments?.length}</Text>
+            </View>
           </View>
 
           <View
@@ -116,9 +135,9 @@ export default function DetailScreen({ route }) {
               borderTopWidth: 1,
               paddingTop: 8,
             }}
-          >          
+          >
             {data.getPostsById.comments?.map((comment, idx) => (
-              <CommentCard key={comment._id || idx} comment={comment} />
+              <CommentCard key={idx} comment={comment} />
             ))}
           </View>
         </View>

@@ -56,8 +56,14 @@ const resolvers = {
 
       const postRedis = await redis.get("posts");
       if (postRedis) {
-        console.log(postRedis, "post from redis");
-        return JSON.parse(postRedis);
+        const posts = JSON.parse(postRedis);
+        posts.forEach(post => {
+          if (post.createdAt) {
+            post.createdAt = new Date(post.createdAt);  
+          }
+        });
+        console.log(posts, "post from redis");
+        return posts;
       }
       const post = await postModel.getAllPosts();
       redis.set("posts", JSON.stringify(post));

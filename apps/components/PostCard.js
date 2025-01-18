@@ -10,11 +10,15 @@ const ADD_LIKE = gql`
     addLike(postId: $postId)
   }
 `;
-
 const formatRelativeDate = (dateString) => {
-  const date = new Date(dateString);
+  const timestamp = Number(dateString);
+  const date = isNaN(timestamp) ? null : new Date(timestamp);
+  if (isNaN(date)) {
+    return "Invalid date";
+  }
   return formatDistanceToNow(date, { addSuffix: true });
 };
+``;
 
 export default function Postcard({ posts }) {
   const navigation = useNavigation();
@@ -58,7 +62,7 @@ export default function Postcard({ posts }) {
       >
         <Image
           source={{ uri: posts.imgUrl }}
-          style={{ width: 200, height: 200, borderRadius: 10 ,marginTop:20 }}
+          style={{ width: 300, height: 200, borderRadius: 10, marginTop: 20,objectFit:'cover' }}
         />
       </Pressable>
 
@@ -95,7 +99,7 @@ export default function Postcard({ posts }) {
             flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
-            marginTop:20
+            marginTop: 20,
           }}
         >
           <Pressable
@@ -126,15 +130,15 @@ export default function Postcard({ posts }) {
         </View>
       </View>
       <Text
-          style={{
-            fontSize: 13,
-            color: "black",
-            position: "absolute", 
-            right: 10, 
-          }}>
-          Posted: {formatRelativeDate(posts.createdAt)}
-        </Text>
+        style={{
+          fontSize: 13,
+          color: "black",
+          position: "absolute",
+          right: 10,
+        }}
+      >
+        Posted: {formatRelativeDate(posts.createdAt)}
+      </Text>
     </View>
   );
 }
-
