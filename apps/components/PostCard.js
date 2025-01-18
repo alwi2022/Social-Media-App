@@ -89,38 +89,37 @@ export default function Postcard({ posts }) {
             flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
+            marginTop:20
           }}
         >
-          <AntDesign
-            name="like2"
-            size={24}
-            color={posts.likes?.length > 0 ? "blue" : "black"}
+          <Pressable
             onPress={() => handleLike(posts._id)}
-          />
-          <Text>{posts.likes?.length}</Text>
-          <FontAwesome5
-            name="comment"
-            size={24}
-            color={posts.comments?.length > 0 ? "blue" : "black"}
-          />
-          <Text>{posts.comments?.length}</Text>
+            disabled={loading}
+            style={{ flexDirection: "row", alignItems: "center" }}
+          >
+            <AntDesign
+              name="like2"
+              size={24}
+              color={posts.likes?.length > 0 ? "blue" : "black"}
+            />
+            <Text style={{ fontSize: 14, marginLeft: 4 }}>
+              {posts.likes?.length}
+            </Text>
+          </Pressable>
+
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <FontAwesome5
+              name="comment"
+              size={24}
+              color={posts.comments?.length > 0 ? "blue" : "black"}
+            />
+            <Text style={{ marginLeft: 4, fontSize: 14 }}>
+              {posts.comments?.length}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "white",
-    flexDirection: "row",
-    gap: 8,
-    overflow: "hidden",
-    marginTop: 8,
-    marginBottom: 2,
-    borderRadius: 10,
-    overflow: "hidden",
-    shadowColor: "#000",
-    padding: 10,
-  },
-});
