@@ -36,16 +36,18 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    getUserById: async (_, args) => {
+    getUserById: async (_, args, { authentication }) => {
+      await authentication();
       const { _id } = args;
       const user = await UserModel.findById(_id);
       return user;
     },
 
-    getUserByUserName: async (_, args) => {
+    getUserByUserName: async (_, args, { authentication }) => {
+      await authentication();
       const { username } = args;
       const result = await UserModel.getUsername(username);
-    
+
       return result;
     },
   },
@@ -60,8 +62,8 @@ const resolvers = {
     login: async (_, args) => {
       const { username, password } = args;
       const user = await UserModel.login(username, password);
-      console.log(user,'ini user');
-      
+      console.log(user, "ini user");
+
       return user;
     },
   },

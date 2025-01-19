@@ -38,9 +38,11 @@ export default function SearchScreen() {
   );
 
   const handleSearch = async () => {
-    const response = await search({ variables: { username } });
-    console.log(response);
-    return response;
+    if (!username.trim()) {
+      Alert.alert("Username is required");
+      return;
+    }
+    await search({ variables: { username } });
   };
 
   const handleFollow = async (followingId) => {
@@ -120,7 +122,7 @@ export default function SearchScreen() {
                 </View>
               </View>
 
-              <View style={{ marginTop: 10,}}>
+              <View style={{ marginTop: 10,width:100}}>
                 <Button
                   title="Follow"
                   onPress={() => handleFollow(item._id)}

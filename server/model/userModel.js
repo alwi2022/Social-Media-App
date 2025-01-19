@@ -51,7 +51,7 @@ class UserModel {
       throw new Error("Username is required");
     }
     if (!password) {
-      throw new Error("Username is required");
+      throw new Error("Password is required");
     }
 
     const user = await this.collection().findOne({ username });

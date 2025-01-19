@@ -67,7 +67,7 @@ export default function RootStack() {
             <stack.Screen
               name="Details"
               component={DetailScreen}
-              options={({ route }) => ({ title: route.params.name })}
+              options={({ route }) => ({ title: "Post" })}
             />
             <stack.Screen
               name="Profile"

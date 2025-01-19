@@ -36,6 +36,7 @@ export default function CreatePostScreen() {
   });
 
 
+
   if (loading)
     return (
       <View

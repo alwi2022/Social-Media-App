@@ -6,9 +6,11 @@ import {
   ActivityIndicator,
   Alert,
   Button,
+  Image,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -61,67 +63,127 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 16 }}>
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <Text style={{ color: "green", fontWeight: "900", fontSize: 24 }}>
-          Register
-        <FontAwesome5 name="line" size={24} color="green" />
-        </Text>
+    <View style={styles.container}>
+      {/* Logo */}
+      <View style={styles.logoContainer}>
+        <Image
+          source={{
+            uri: "https://vos.line-scdn.net/strapi-cluster-instance-bucket-84/appicon_01_f9ed1cf01f.jpeg",
+          }}
+          style={styles.logo}
+        />
       </View>
 
-      <View>
-        <Text>Name</Text>
-        <TextInput value={name} onChangeText={setName} style={styles.input} />
-      </View>
-      <View>
-        <Text>Username</Text>
+      {/* Header */}
+      <Text style={styles.headerText}>Create Your LINE Account</Text>
+
+      {/* Input Fields */}
+      <View style={styles.inputContainer}>
         <TextInput
-          value={username}
+          placeholder="Name"
+          onChangeText={setName}
+          value={name}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Username"
           onChangeText={setUsername}
+          value={username}
           style={styles.input}
         />
-      </View>
-
-      <View>
-        <Text>Email</Text>
-        <TextInput value={email} onChangeText={setEmail} style={styles.input} />
-      </View>
-
-      <View>
-        <Text>Password</Text>
         <TextInput
-          value={password}
-          onChangeText={setPassword}
+          placeholder="Email"
+          onChangeText={setEmail}
+          value={email}
           style={styles.input}
-          secureTextEntry
+        />
+        <TextInput
+          placeholder="Password"
+          onChangeText={setPassword}
+          value={password}
+          style={styles.input}
+          secureTextEntry={true}
         />
       </View>
 
+      {/* Register Button */}
       {loading ? (
-        <ActivityIndicator size={"large"} color={"green"} />
+        <ActivityIndicator size="large" color="#00C300" />
       ) : (
-        <Button title="Register" onPress={submitRegister} color="#00C300" />
+        <TouchableOpacity style={styles.registerButton} onPress={submitRegister}>
+          <Text style={styles.registerButtonText}>Sign Up</Text>
+        </TouchableOpacity>
       )}
 
+      {/* Login Link */}
       <View style={styles.footer}>
-        <Text>Already have an account?</Text>
-        <Button
-          title="Login"
-          onPress={() => navigation.navigate("Login")}
-          color="#00C300"
-        />
+        <Text style={styles.footerText}>Already have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.loginText}>Login here</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  input: {
-    height: 40,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 4,
-    marginBottom: 8,
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    backgroundColor: "#F5F5F5",
   },
-
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#00C300",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  input: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#CCC",
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#FFF",
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  registerButton: {
+    backgroundColor: "#00C300",
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  registerButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footer: {
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  loginText: {
+    fontSize: 14,
+    color: "#00C300",
+    fontWeight: "bold",
+    marginTop: 5,
+  },
 });
