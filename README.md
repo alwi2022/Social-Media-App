@@ -8,35 +8,18 @@ My Social Media App adalah sebuah aplikasi client(mobile)-server. Challenge ini 
 
 ### Struktur Folder
 
-- [ ] server: untuk menyimpan aplikasi server GraphQL kamu
-- [ ] app: untuk menyimpan aplikasi mobile React Native kamu
+- [V] server: untuk menyimpan aplikasi server GraphQL kamu
+- [V] app: untuk menyimpan aplikasi mobile React Native kamu
 
 ### Fitur
 
-- [ ] Fitur Register
-- [ ] Fitur Login
-- [ ] FItur Add Post
-- [ ] Fitur Show Post (berdasarkan yang paling baru)
-- [ ] Fitur Comment Post (Embedded Document)
-- [ ] Fitur search user berdasarkan nama atau username
-- [ ] Fitur follow
-- [ ] Menampilkan Followers dan Following dari setiap user (Reference with $lookup)
-- [ ] Fitur Like Post
-- [ ] Menampilkan total like dari setiap post
-
-module.exports={
-apps:[
-{
-name:"GC-01",
-script:"./index.js",
-env:{
-NODE_ENV:"production",
-PORT:80,
-SECRET:"secret",
-MONGODB_URL:"mongodb+srv://imambahrialwi21:TLLTxAjT1aLfkVrN@cluster0.tjgsf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-REDIS_PASSWORD:"kF0XaIfBEZTMmMGWo8WdHIol5J942S2V",
-REDIS_URL:"redis-13643.c1.ap-southeast-1-1.ec2.redns.redis-cloud.com",
-},
-}
-],
-};
+- [V] Fitur Register
+- [V] Fitur Login
+- [V] FItur Add Post
+- [V] Fitur Show Post (berdasarkan yang paling baru)
+- [V] Fitur Comment Post (Embedded Document)
+- [V] Fitur search user berdasarkan nama atau username
+- [V] Fitur follow
+- [V] Menampilkan Followers dan Following dari setiap user (Reference with $lookup)
+- [V] Fitur Like Post
+- [V] Menampilkan total like dari setiap post

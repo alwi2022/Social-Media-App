@@ -31,8 +31,7 @@ const resolvers = {
       );
 
       if (existingFollow) {
-        const result = await followModel.delete(user._id, followingId);
-        return "unfollow";
+        return "You already follow this user";
       } else {
         const newFollow = {
           followingId,
@@ -40,6 +39,26 @@ const resolvers = {
         };
         const result = await followModel.create(newFollow);
         return "follow";
+      }
+    },
+
+    unfollow: async (_, { followingId }, { authentication }) => {
+      const user = await authentication();
+      if (String(user._id) === followingId) {
+        throw new Error("You cannot Unfoll yourself");
+      }
+
+
+      const existingFollow = await followModel.checkUserFollow(
+        user._id,
+        followingId
+      );
+
+      if (!existingFollow) {
+        return "You already unfollow this user";
+      } else {
+        await followModel.delete(user._id, followingId);
+        return "unfollow";
       }
     },
   },

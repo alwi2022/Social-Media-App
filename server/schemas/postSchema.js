@@ -121,7 +121,6 @@ const resolvers = {
       const user = await authentication();
       const { postId } = args;
       const isLiked = await postModel.checkUserLike(postId, user.username);
-      console.log(isLiked);
       
       if (isLiked) {
         await postModel.removeLike(postId, user.username);
