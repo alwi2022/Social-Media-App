@@ -16,6 +16,12 @@ class UserModel {
     if (!newUser.password) {
       throw new Error("Password is required");
     }
+    if (!newUser.username) {
+      throw new Error("username is required");
+    }
+    if (!newUser.name) {
+      throw new Error("name is required");
+    }
 
     const emailExist = await this.collection().findOne({
       email: newUser.email,
