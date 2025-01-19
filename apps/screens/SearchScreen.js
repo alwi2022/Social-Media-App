@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-
+import * as SecureStore from "expo-secure-store";
 const GET_USER_BY_USERNAME = gql`
   query GetUserByUserName($username: String) {
     getUserByUserName(username: $username) {
@@ -23,6 +23,12 @@ const GET_USER_BY_USERNAME = gql`
   }
 `;
 
+const UNFOLLOW_USER = gql`
+  mutation Unfollow($followingId: ID) {
+    unfollow(followingId: $followingId)
+  }
+`;
+
 const FOLLOW_USER = gql`
   mutation Follow($followingId: ID) {
     follow(followingId: $followingId)
@@ -31,11 +37,11 @@ const FOLLOW_USER = gql`
 
 export default function SearchScreen() {
   const [username, setUsername] = useState("");
-
+const userId = SecureStore.getItem("user_id");
   const [followUser] = useMutation(FOLLOW_USER);
-  const [search, { loading, data, error, refetch }] = useLazyQuery(
-    GET_USER_BY_USERNAME
-  );
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [search, { loading, data, error, refetch }] =
+    useLazyQuery(GET_USER_BY_USERNAME);
 
   const handleSearch = async () => {
     if (!username.trim()) {
@@ -45,16 +51,34 @@ export default function SearchScreen() {
     await search({ variables: { username } });
   };
 
+  const handleUnFollow = async (followingId) => {
+    try {
+      const response = await unfollowUser({
+        variables: { followingId },
+      });
+
+      if (response.data.unfollow === "unfollow") {
+        Alert.alert("unfollow successful:", response.data.unfollow);
+      } else if (response.data.unfollow === "You already unfollow this user") {
+        Alert.alert(response.data.unfollow);
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
   const handleFollow = async (followingId) => {
     try {
       const response = await followUser({ variables: { followingId } });
       if (response.data.follow === "follow") {
         Alert.alert("Follow successful:", response.data.follow);
-      } else {
-        Alert.alert("Unfollow successful:", response.data.follow);
+      } else if (response.data.follow === "You already follow this user") {
+        Alert.alert(response.data.follow);
       }
       await refetch();
     } catch (error) {
+      console.log(error, "ini erro follow");
+
       Alert.alert(error.message);
     }
   };
@@ -77,62 +101,72 @@ export default function SearchScreen() {
   }
 
   return (
-   
-      <View style={{ flex: 1, padding: 20 }}>
-        <TextInput
-          style={styles.input}
-          placeholder="Search by username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <View>
-          {loading ? (
-            <ActivityIndicator size={"large"} color={"green"} />
-          ) : (
-            <Button title="Search" color="#00C300" onPress={handleSearch} />
-          )}
-        </View>
+    <View style={{ flex: 1, padding: 20 }}>
+      <TextInput
+        style={styles.input}
+        placeholder="Search by username"
+        value={username}
+        onChangeText={setUsername}
+      />
+      <View>
+        {loading ? (
+          <ActivityIndicator size={"large"} color={"green"} />
+        ) : (
+          <Button title="Search" color="#00C300" onPress={handleSearch} />
+        )}
+      </View>
 
-        <FlatList
-          data={data?.getUserByUserName}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={{ paddingBottom: 20 }} 
-          renderItem={({ item }) => (
-            <View style={styles.userCard}>
-              <View style={{  flexDirection: "row",
-    alignItems: "center",}}>
-                <Image
-                  source={{
-                    uri: `https://avatar.iran.liara.run/public/boy?username=${item.username}`,
-                  }}
-                  style={{ width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: "lightgray",
-                    marginRight: 10,}}
-                />
-                <View style={{flex: 1,}}>
-                  <Text style={{ fontWeight: "bold",
-    fontSize: 16,}}>{item.name}</Text>
-                  <Text style={{ fontSize: 14,
-    color: "gray",}}>
-                    Username: {item.username}
-                  </Text>
-                  <Text style={styles.userDetails}>Email: {item.email}</Text>
-                </View>
-              </View>
-
-              <View style={{ marginTop: 10,width:100}}>
-                <Button
-                  title="Follow"
-                  onPress={() => handleFollow(item._id)}
-                  color="#00C300"
-                />
+      <FlatList
+        data={data?.getUserByUserName?.filter((user) => user._id !== userId)}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.userCard}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image
+                source={{
+                  uri: `https://avatar.iran.liara.run/public/boy?username=${item.username}`,
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "lightgray",
+                  marginRight: 10,
+                }}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                  {item.name}
+                </Text>
+                <Text style={{ fontSize: 14, color: "gray" }}>
+                  Username: {item.username}
+                </Text>
+                <Text style={styles.userDetails}>Email: {item.email}</Text>
               </View>
             </View>
-          )}
-        />
-      </View>
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+  <View style={{ flex: 1, marginRight: 5 }}>
+    <Button
+      title="Follow"
+      onPress={() => handleFollow(item._id)}
+      color="#00C300"
+    />
+  </View>
+  <View style={{ flex: 1, marginLeft: 5 }}>
+    <Button
+      title="Unfollow"
+      onPress={() => handleUnFollow(item._id)}
+      color="red"
+    />
+  </View>
+</View>
+
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
