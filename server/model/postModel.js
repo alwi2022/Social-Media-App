@@ -10,6 +10,21 @@ class postModel {
     return result;
   }
 
+  static async deletePost(_id) {
+    const result = await this.collection().deleteOne({ _id: new ObjectId(String(_id)) });
+    return result;
+  }
+
+
+  static async updatePost(_id, updatePost) {
+    const result = await this.collection().updateOne(
+      { _id: new ObjectId(String(_id)) },
+      { $set: updatePost }
+    );
+    return result;
+  }
+
+
   static async getAllPosts() {
     const agg = [
       {

@@ -5,18 +5,18 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
+  TextInput,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { gql, useMutation } from "@apollo/client";
-import { formatDistanceToNow, set } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Modal from "react-native-modal";
-
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useState } from "react";
+import Modal from "react-native-modal";
+
 const ADD_LIKE = gql`
   mutation AddLike($postId: ID) {
     addLike(postId: $postId)
@@ -66,21 +66,9 @@ export default function Postcard({ posts }) {
     refetchQueries: ["GetPosts"],
   });
 
-  const handleLike = async (postId) => {
-    try {
-      await like({
-        variables: { postId },
-      });
-    } catch (error) {
-      Alert.alert(error.message);
-    }
-  };
-
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updatedContent, setUpdatedContent] = useState(posts.content);
-  const [updatedTags, setUpdatedTags] = useState(posts.tags.join(", "));
-  const [updatedImgUrl, setUpdatedImgUrl] = useState(posts.imgUrl);
 
   const [deletePost] = useMutation(DELETE_POST, {
     refetchQueries: ["GetPosts"],
@@ -106,11 +94,7 @@ export default function Postcard({ posts }) {
               "Post Deleted",
               "The post has been deleted successfully."
             );
-
-            // Tambahkan delay sebelum modal ditutup
-            setTimeout(() => {
-              setShowModal(false);
-            }, 500);
+            setShowModal(false);
           } catch (error) {
             Alert.alert("Error", error.message);
           }
@@ -121,25 +105,11 @@ export default function Postcard({ posts }) {
 
   const handleUpdate = async () => {
     try {
-      // Cegah imgUrl menjadi kosong
-      const finalImgUrl =
-        updatedImgUrl.trim() === "" ? posts.imgUrl : updatedImgUrl;
-
       await updatePost({
-        variables: {
-          postId: posts._id,
-          content: updatedContent,
-          tags: updatedTags.split(",").map((el) => el.trim()),
-          imgUrl: finalImgUrl, // Gunakan nilai terakhir
-        },
+        variables: { postId: posts._id, content: updatedContent },
       });
-
       Alert.alert("Post Updated", "The post has been updated successfully.");
-
-      // Tambahkan delay agar modal tidak glitch
-      setTimeout(() => {
-        setShowUpdateModal(false);
-      }, 500);
+      setShowUpdateModal(false);
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -169,9 +139,7 @@ export default function Postcard({ posts }) {
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.postContent} numberOfLines={2}>
-          {posts.content}
-        </Text>
+        <Text style={styles.postContent}>{posts.content}</Text>
       </View>
 
       {/* Post Image */}
@@ -183,7 +151,7 @@ export default function Postcard({ posts }) {
       <View style={styles.actionsContainer}>
         <View style={styles.actionsLeft}>
           <Pressable
-            onPress={() => handleLike(posts._id)}
+            onPress={() => like({ variables: { postId: posts._id } })}
             disabled={loading}
             style={styles.actionButton}
           >
@@ -208,15 +176,6 @@ export default function Postcard({ posts }) {
             <FontAwesome5 name="comment" size={20} style={styles.actionIcon} />
             <Text style={styles.actionText}>{posts.comments?.length}</Text>
           </Pressable>
-
-          <Pressable style={styles.actionButton}>
-            <MaterialCommunityIcons
-              name="share-variant"
-              size={20}
-              color={"#888"}
-              style={styles.actionIcon}
-            />
-          </Pressable>
         </View>
         <Text style={styles.timeText}>
           {formatRelativeDate(posts.createdAt)}
@@ -224,20 +183,10 @@ export default function Postcard({ posts }) {
       </View>
 
       {/* Modal for Options */}
-      {/* Modal untuk Opsi */}
-      <Modal
-        isVisible={showModal}
-        onBackdropPress={() => setShowModal(false)}
-        animationIn="fadeInUp"
-        animationOut="fadeOutDown"
-        backdropOpacity={0.5} // Tambahkan efek transparan
-      >
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
         <View style={styles.modalContainer}>
           <Pressable
-            onPress={() => {
-              setShowModal(false);
-              setTimeout(() => setShowUpdateModal(true), 200);
-            }}
+            onPress={() => setShowUpdateModal(true)}
             style={styles.modalButton}
           >
             <Text style={styles.modalText}>Update</Text>
@@ -251,43 +200,19 @@ export default function Postcard({ posts }) {
         </View>
       </Modal>
 
+      {/* Modal for Update */}
       <Modal
         isVisible={showUpdateModal}
         onBackdropPress={() => setShowUpdateModal(false)}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.5}
       >
         <View style={styles.updateModalContainer}>
           <Text style={styles.modalTitle}>Update Post</Text>
-
           <TextInput
             style={styles.input}
             value={updatedContent}
             onChangeText={setUpdatedContent}
             multiline
-            placeholder="Update content..."
-            onFocus={() => setShowUpdateModal(true)} // Pastikan tetap terbuka
           />
-
-          <TextInput
-            style={styles.input}
-            value={updatedTags}
-            onChangeText={setUpdatedTags}
-            multiline
-            placeholder="Update tags..."
-            onFocus={() => setShowUpdateModal(true)}
-          />
-
-          <TextInput
-            style={styles.input}
-            value={updatedImgUrl}
-            onChangeText={setUpdatedImgUrl}
-            multiline
-            placeholder="Update image URL..."
-            onFocus={() => setShowUpdateModal(true)}
-          />
-
           <Pressable onPress={handleUpdate} style={styles.modalButton}>
             <Text style={styles.modalText}>Save</Text>
           </Pressable>
@@ -298,90 +223,6 @@ export default function Postcard({ posts }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    marginVertical: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  avatarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  username: {
-    fontWeight: "bold",
-    fontSize: 14,
-    color: "#333",
-  },
-  subText: {
-    fontSize: 12,
-    color: "#888",
-  },
-  menuIcon: {
-    color: "#888",
-  },
-  contentContainer: {
-    marginBottom: 10,
-  },
-  postContent: {
-    fontSize: 15,
-    color: "#444",
-    marginBottom: 10,
-    lineHeight: 22,
-  },
-  postImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  actionsLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  actionIcon: {
-    marginRight: 5,
-    // color: "#555",
-  },
-  actionText: {
-    fontSize: 13,
-    color: "#555",
-  },
-  timeText: {
-    fontSize: 12,
-    color: "#999",
-  },
-
   card: {
     backgroundColor: "#fff",
     borderRadius: 15,

@@ -12,6 +12,10 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import SearchScreen from "../screens/SearchScreen";
 import CreatePostScreen from "../screens/CreatePostScreen";
+import WelcomeScreen from "../screens/GetStartedScreen";
+import ChatScreen from "../screens/ChatScreen";
+import ChatDetail from "../screens/ChatDetail";
+import SearchScreenDetail from "../screens/SearchScreenDetail";
 
 const stack = createNativeStackNavigator();
 
@@ -39,16 +43,12 @@ export default function RootStack() {
 
   return (
     <>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent={false}
-      />
+    
       <stack.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: "#00C300" },
-          headerTintColor: "#fff",
-          headerTitleStyle: { fontWeight: "bold" },
+          // headerStyle: { backgroundColor: "#00C300" },
+          // headerTintColor: "#fff",
+          // headerTitleStyle: { fontWeight: "bold" },
           headerShown: true,
         }}
       >
@@ -58,8 +58,7 @@ export default function RootStack() {
               name="Home"
               component={TabNavigator}
               options={({ route }) => {
-                const routeName =
-                  getFocusedRouteNameFromRoute(route) ?? "Home";
+                const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
                 return { title: routeName };
               }}
             />
@@ -80,6 +79,21 @@ export default function RootStack() {
               options={{ title: "Search Users" }}
             />
             <stack.Screen
+              name="SearchDetail"
+              component={SearchScreenDetail}
+              options={{ title: "Search Users" }}
+            />
+            <stack.Screen
+              name="Chat"
+              component={ChatScreen}
+              options={{ title: "Chat Users" }}
+            />
+            <stack.Screen
+              name="ChatDetail"
+              component={ChatDetail}
+              options={{ title: "Chat Detail" }}
+            />
+            <stack.Screen
               name="CreatePost"
               component={CreatePostScreen}
               options={{ title: "Create Post" }}
@@ -87,6 +101,7 @@ export default function RootStack() {
           </>
         ) : (
           <>
+          <stack.Screen name="Get-Started" component={WelcomeScreen} />
             <stack.Screen name="Login" component={LoginScreen} />
             <stack.Screen name="Register" component={RegisterScreen} />
           </>

@@ -9,18 +9,18 @@ class UserModel {
   }
 
   static async register(newUser) {
+    if (!newUser.name) {
+      throw new Error("name is required");
+    }
+    if (!newUser.username) {
+      throw new Error("username is required");
+    }
     if (!newUser.email) {
       throw new Error("Email is required");
     }
 
     if (!newUser.password) {
       throw new Error("Password is required");
-    }
-    if (!newUser.username) {
-      throw new Error("username is required");
-    }
-    if (!newUser.name) {
-      throw new Error("name is required");
     }
 
     const emailExist = await this.collection().findOne({
@@ -77,22 +77,57 @@ class UserModel {
 
     return {
       access_token: token,
+      username: user.username,
       user_id: user._id,
     };
   }
 
-  static async getUsername(username) {
-    const users = this.collection()
-      .find({
-        username: {
-          $regex: username || "",
-          $options: "i",
+  static async getUsername(username, currentUserId) {
+    const users = await this.collection()
+      .aggregate([
+        {
+          $match: {
+            username: {
+              $regex: username || "",
+              $options: "i",
+            },
+          },
         },
-      })
+        {
+          $lookup: {
+            from: "follows",
+            let: { userId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$followingId", "$$userId"] },
+                      { $eq: ["$followerId", new ObjectId(currentUserId)] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "followInfo",
+          },
+        },
+        {
+          $addFields: {
+            isFollowing: { $gt: [{ $size: "$followInfo" }, 0] },
+          },
+        },
+        {
+          $project: {
+            followInfo: 0,
+          },
+        },
+      ])
       .toArray();
-
+  
     return users;
   }
+  
 
   static async findById(_id) {
     const agg = [
@@ -138,8 +173,6 @@ class UserModel {
     const result = await this.collection().aggregate(agg).toArray();
     return result[0];
   }
-
-
 }
 
 module.exports = UserModel;

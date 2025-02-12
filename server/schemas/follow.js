@@ -10,56 +10,25 @@ type Follow {
     updatedAt: String
 }
 
+type FollowResponse {
+  message: String
+  isFollowing: Boolean
+}
+
+
 
 type Mutation{
-    follow(followingId: ID): String
-    unfollow(followingId: ID): String
+    toggleFollow(followingId: ID!): FollowResponse
 }
 `;
 
 const resolvers = {
   Mutation: {
-    follow: async (_, { followingId }, { authentication }) => {
+    async toggleFollow(_, { followingId }, { authentication }) {
       const user = await authentication();
-      if (String(user._id) === followingId) {
-        throw new Error("You cannot follow yourself");
-      }
+      if (!user) throw new Error("Not authenticated");
 
-      const existingFollow = await followModel.checkUserFollow(
-        user._id,
-        followingId
-      );
-
-      if (existingFollow) {
-        return "You already follow this user";
-      } else {
-        const newFollow = {
-          followingId,
-          followerId: user._id,
-        };
-        const result = await followModel.create(newFollow);
-        return "follow";
-      }
-    },
-
-    unfollow: async (_, { followingId }, { authentication }) => {
-      const user = await authentication();
-      if (String(user._id) === followingId) {
-        throw new Error("You cannot Unfoll yourself");
-      }
-
-
-      const existingFollow = await followModel.checkUserFollow(
-        user._id,
-        followingId
-      );
-
-      if (!existingFollow) {
-        return "You already unfollow this user";
-      } else {
-        await followModel.delete(user._id, followingId);
-        return "unfollow";
-      }
+      return await followModel.toggleFollow(user._id, followingId);
     },
   },
 };

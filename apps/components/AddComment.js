@@ -9,7 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 
 const ADD_COMMENT = gql`
   mutation AddComent($postId: ID, $content: String) {
@@ -43,31 +43,46 @@ export default function AddComment({ postId, refetch }) {
     }
   };
   return (
-    <View style={{ padding: 10, paddingTop: 4 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <TextInput
-          onChangeText={(text) => setComment(text)}
-          value={comment}
-          style={styles.input}
-        />
-        {loading ? (
-          <ActivityIndicator size="large" color="tomato" />
-        ) : (
-          <Pressable onPress={handleSubmit}>
-            <Feather name="send" size={24} color="black" />
-          </Pressable>
-        )}
-      </View>
+    <View style={styles.addCommentContainer}>
+      <TextInput
+        onChangeText={(text) => setComment(text)}
+        value={comment}
+        placeholder="Add a comment..."
+        style={styles.commentInput}
+      />
+      {loading ? (
+        <ActivityIndicator size="large" color="tomato" />
+      ) : (
+        <Pressable style={styles.sendButton} onPress={handleSubmit}>
+          <FontAwesome5 name="paper-plane" size={20} color="white" />
+        </Pressable>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  input: {
-    height: 40,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderRadius: 8,
+  sendButton: {
+    backgroundColor: "#3498db",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  commentInput: {
     flex: 1,
+    backgroundColor: "#f4f4f4",
+    borderRadius: 20,
+    padding: 10,
+    marginRight: 10,
+  },
+  addCommentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
   },
 });

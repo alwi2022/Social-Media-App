@@ -9,7 +9,10 @@ const typeDefs = `#graphql
     email: String
     followers: [FollowUser]
     following: [FollowUser]
+    isFollowing: Boolean
   }
+
+
 
   type FollowUser {
   username: String
@@ -20,6 +23,7 @@ const typeDefs = `#graphql
   type Token{
   access_token: String
   user_id: ID,
+  username: String
   }
 
   type Query {
@@ -44,12 +48,14 @@ const resolvers = {
     },
 
     getUserByUserName: async (_, args, { authentication }) => {
-      await authentication();
+      const user = await authentication();
       const { username } = args;
-      const result = await UserModel.getUsername(username);
-
+    
+      const result = await UserModel.getUsername(username, user._id);
+    
       return result;
     },
+    
   },
 
   Mutation: {

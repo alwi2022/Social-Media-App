@@ -1,16 +1,19 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import {
-  Button,
   FlatList,
   Text,
   View,
   ActivityIndicator,
   StyleSheet,
   Image,
+  Pressable,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import { gql, useQuery } from "@apollo/client";
+import { AntDesign } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 const GET_USER_BY_ID = gql`
   query GetUserById($id: ID) {
@@ -18,14 +21,11 @@ const GET_USER_BY_ID = gql`
       _id
       name
       username
-      email
       followers {
         username
-        email
       }
       following {
         username
-        email
       }
     }
   }
@@ -33,18 +33,29 @@ const GET_USER_BY_ID = gql`
 
 export default function ProfileScreen() {
   const { setIsSignedIn } = useContext(AuthContext);
-
   const userId = SecureStore.getItem("user_id");
 
-  const { data, loading, error, refetch } = useQuery(GET_USER_BY_ID, {
+  const { data, loading, error, refetch  } = useQuery(GET_USER_BY_ID, {
     variables: { id: userId },
     fetchPolicy: "network-only",
   });
 
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="green" />
+        <LottieView
+          source={require("../assets/animations/AnimationAMongus.json")}
+          autoPlay
+          loop
+          style={{ width: 150, height: 150 }}
+        />
+        <Text style={styles.loadingText}>Loading Profile...</Text>
       </View>
     );
   }
@@ -58,19 +69,8 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <View style={{width:100,marginLeft:'230'}}>
-        <Button
-        title="Logout"
-        onPress={async () => {
-          setIsSignedIn(false);
-          await SecureStore.deleteItemAsync("access_token");
-          await SecureStore.deleteItemAsync("user_id");
-        }}
-        color="red"
-      />
-
-      </View>
+    <View style={styles.container}>
+      {/* Avatar & User Info */}
       <View style={styles.profileHeader}>
         <Image
           source={{
@@ -78,69 +78,49 @@ export default function ProfileScreen() {
           }}
           style={styles.profileAvatar}
         />
-        <Text style={styles.header}>{data?.getUserById?.name}</Text>
-        <Text style={styles.info}>{data?.getUserById?.username}</Text>
-        <Text style={styles.info}>{data?.getUserById?.email}</Text>
-        
-        
+        <Text style={styles.username}>{data?.getUserById?.username}</Text>
+        <Text style={styles.name}>{data?.getUserById?.name}</Text>
       </View>
 
-      <Text style={styles.subHeader}>Followers:</Text>
-      <FlatList
-        data={data?.getUserById?.followers}
-        keyExtractor={(item) => item.username}
-        onRefresh={async () => {
-          await refetch();
-        }}
-        refreshing={loading}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalList}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image
-              source={{
-                uri: `https://avatar.iran.liara.run/public/boy?username=${item?.username}`,
-              }}
-              style={styles.avatar}
-            />
-            <Text style={styles.cardText}>{item.username}</Text>
-            <Text style={styles.cardText}>{item.email}</Text>
-          </View>
-        )}
-      />
+      {/* Followers & Following */}
+      <View style={styles.statsContainer}>
+        <View style={styles.statBox}>
+          <Text style={styles.statNumber}>
+            {data?.getUserById?.followers.length}
+          </Text>
+          <Text style={styles.statText}>Followers</Text>
+        </View>
+        <View style={styles.statBox}>
+          <Text style={styles.statNumber}>
+            {data?.getUserById?.following.length}
+          </Text>
+          <Text style={styles.statText}>Following</Text>
+        </View>
+      </View>
 
-      <Text style={styles.subHeader}>Following:</Text>
-      <FlatList
-        data={data?.getUserById?.following}
-        keyExtractor={(item) => item.username}
-        onRefresh={async () => {
-          await refetch();
+      {/* Logout Button */}
+      <Pressable
+        style={styles.logoutButton}
+        onPress={async () => {
+          setIsSignedIn(false);
+          await SecureStore.deleteItemAsync("access_token");
+          await SecureStore.deleteItemAsync("user_id");
         }}
-        refreshing={loading}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalList}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image
-              source={{
-                uri: `https://avatar.iran.liara.run/public/boy?username=${item?.username}`,
-              }}
-              style={styles.avatar}
-            />
-            <Text style={styles.cardText}>{item.username}</Text>
-            <Text style={styles.cardText}>{item.email}</Text>
-          </View>
-        )}
-      />
-
-    
+      >
+        <AntDesign name="logout" size={18} color="white" />
+        <Text style={styles.logoutText}>Logout</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f9f9f9",
+    padding: 20,
+    alignItems: "center",
+  },
   center: {
     flex: 1,
     justifyContent: "center",
@@ -151,46 +131,67 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileAvatar: {
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 80,
     borderRadius: 40,
     marginBottom: 10,
-    backgroundColor: "lightgray",
+    borderWidth: 2,
+    borderColor: "#00C300",
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "green",
-  },
-  subHeader: {
+  username: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 8,
+    color: "#333",
   },
-  info: {
-    fontSize: 16,
-    marginBottom: 4,
+  name: {
+    fontSize: 14,
+    color: "#555",
   },
-  horizontalList: {
-    paddingVertical: 10,
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "60%",
+    marginVertical: 15,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  card: {
-    backgroundColor: "#f8f8f8",
+  statBox: {
+    alignItems: "center",
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#00C300",
+  },
+  statText: {
+    fontSize: 12,
+    color: "#777",
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#e74c3c",
     padding: 10,
     borderRadius: 8,
-    marginHorizontal: 8,
-    alignItems: "center",
-    width: 120,
+    marginTop: 20,
+    width: "50%",
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginBottom: 8,
+  logoutText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
+    marginLeft: 6,
   },
-  cardText: {
-    fontSize: 12,
-    textAlign: "center",
+  loadingText: {
+    fontSize: 16,
+    color: "#555",
+    marginTop: 10,
   },
 });

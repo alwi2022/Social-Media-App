@@ -4,6 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ProfileScreen from "../screens/ProfileScreen";
 import SearchScreen from "../screens/SearchScreen";
 import CreatePostScreen from "../screens/CreatePostScreen";
+import ChatScreen from "../screens/ChatScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,8 +20,8 @@ export default function TabNavigator() {
             iconName = focused ? "search": "search-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
-          } else if (route.name === "Story") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
+          } else if (route.name === "Chat") {
+            iconName = focused ? "chatbubbles" : "chatbubbles-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -30,8 +31,8 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Story" component={CreatePostScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

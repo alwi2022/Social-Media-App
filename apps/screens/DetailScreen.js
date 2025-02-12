@@ -5,11 +5,14 @@ import {
   ScrollView,
   Text,
   View,
+  Pressable,
+  StyleSheet,
 } from "react-native";
-import AddComment from "../components/AddComment";
-import CommentCard from "../components/CommentCard";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import AddComment from "../components/AddComment";
+import CommentCard from "../components/CommentCard";
+
 const GET_POST_BY_ID = gql`
   query GetPostsById($id: ID) {
     getPostsById(_id: $id) {
@@ -50,7 +53,7 @@ export default function DetailScreen({ route }) {
 
   const handleLike = async (postId) => {
     try {
-      const result = await like({
+      await like({
         variables: { postId },
       });
     } catch (error) {
@@ -60,7 +63,7 @@ export default function DetailScreen({ route }) {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.center}>
         <ActivityIndicator size="large" color="green" />
         <Text>Loading...</Text>
       </View>
@@ -69,128 +72,164 @@ export default function DetailScreen({ route }) {
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.center}>
         <Text>{error.message}</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "space-between" }}>
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
-      >
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
         <Image
           source={{
             uri: `https://avatar.iran.liara.run/public/boy?username=${data.getPostsById?.authorDetail.username}`,
           }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: "lightgray",
-          }}
+          style={styles.avatar}
         />
-        <Text style={{ fontWeight: "bold", fontSize: 16, marginLeft: 8 }}>
-          {data.getPostsById?.authorDetail.username}
-        </Text>
+        <View style={styles.headerInfo}>
+          <Text style={styles.username}>{data.getPostsById?.authorDetail.username}</Text>
+          <Text style={styles.subText}>@{data.getPostsById?.authorDetail.name}</Text>
+        </View>
+        <AntDesign name="ellipsis1" size={22} color="#777" />
       </View>
 
       <ScrollView>
-        <View style={{ padding: 8 }}>
-          <View
-            style={{ alignItems: "center", paddingTop: 5, borderRadius: 20 }}
-          >
+        {/* Content */}
+        <View style={styles.content}>
+          <Text style={styles.contentText}>{data.getPostsById.content}</Text>
+
+          {/* Image */}
+          {data.getPostsById.imgUrl && (
             <Image
-              source={{
-                uri: `${data.getPostsById.imgUrl}`,
-              }}
-              style={{
-                width: 300,
-                height: 300,
-                objectFit: "cover",
-                borderRadius: 8,
-                marginBottom: 16,
-              }}
+              source={{ uri: `${data.getPostsById.imgUrl}` }}
+              style={styles.contentImage}
             />
+          )}
+
+          {/* Tags */}
+          <View style={styles.tagsContainer}>
+            {data.getPostsById.tags?.map((tag, idx) => (
+              <Text key={idx} style={styles.tag}>#{tag}</Text>
+            ))}
           </View>
 
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-              {data.getPostsById.content}
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                marginBottom: 8,
-              }}
-            >
-              {data.getPostsById.tags?.map((tag, idx) => (
-                <Text
-                  key={idx}
-                  style={{ fontSize: 14, marginRight: 6, color: "gray" }}
-                >
-                  #{tag}
-                </Text>
-              ))}
-            </View>
-            <Text style={{ fontSize: 16, color: "gray", marginVertical: 8 }}>
-              Posted by: {data.getPostsById.authorDetail.name}
-            </Text>
-            <Text>Username: {data.getPostsById.authorDetail.username}</Text>
+          {/* Actions */}
+          <View style={styles.actionsContainer}>
+            <Pressable style={styles.actionButton} onPress={() => handleLike(data.getPostsById._id)}>
+              <AntDesign name="like1" size={22} color={data.getPostsById.likes?.length > 0 ? "#007AFF" : "#888"} />
+              <Text style={styles.actionText}>{data.getPostsById.likes?.length}</Text>
+            </Pressable>
+
+            <Pressable style={styles.actionButton}>
+              <FontAwesome5 name="comment" size={20} color={data.getPostsById.comments?.length > 0 ? "#007AFF" : "#888"} />
+              <Text style={styles.actionText}>{data.getPostsById.comments?.length}</Text>
+            </Pressable>
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 16,
-              marginTop: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <AntDesign
-                name="like2"
-                size={24}
-                color={data.getPostsById.likes?.length > 0 ? "blue" : "black"}
-                onPress={() => handleLike(data.getPostsById._id)}
-              />
-              <Text style={{ marginLeft: 6 }}>
-                {data.getPostsById.likes?.length}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome5
-                name="comment"
-                size={24}
-                color={
-                  data.getPostsById.comments?.length > 0 ? "blue" : "black"
-                }
-              />
-              <Text style={{ marginLeft: 6 }}>
-                {data.getPostsById.comments?.length}
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              gap: 8,
-              marginTop: 8,
-              borderTopColor: "lightgray",
-              borderTopWidth: 1,
-              paddingTop: 8,
-            }}
-          >
+          {/* Comments */}
+          <View style={styles.commentsContainer}>
             {data.getPostsById.comments?.map((comment, idx) => (
-              <CommentCard key={idx} comment={comment} />
+              <View key={idx} style={styles.commentCard}>
+                <CommentCard key={idx} comment={comment} />
+              </View>
             ))}
           </View>
         </View>
       </ScrollView>
-      <AddComment postId={data.getPostsById._id} refetch={refetch} />
+
+      {/* Add Comment */}
+      <View style={styles.addCommentContainer}>
+        <AddComment postId={data.getPostsById._id} refetch={refetch} />
+      </View>
     </View>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  avatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    marginRight: 10,
+  },
+  headerInfo: {
+    flex: 1,
+  },
+  username: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#333",
+  },
+  subText: {
+    fontSize: 12,
+    color: "#666",
+  },
+  content: {
+    padding: 15,
+  },
+  contentText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 10,
+  },
+  contentImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  tag: {
+    fontSize: 14,
+    color: "#007AFF",
+    marginRight: 5,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  actionText: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: "#555",
+  },
+  commentsContainer: {
+    marginTop: 10,
+  },
+  commentCard: {
+    marginBottom: 10,
+  },
+  addCommentContainer: {
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+});

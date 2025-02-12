@@ -6,26 +6,35 @@ class followModel {
     return database.collection("follows");
   }
 
+
   static async checkUserFollow(followerId, followingId) {
     const follow = await this.collection().findOne({
       followerId: new ObjectId(String(followerId)),
       followingId: new ObjectId(String(followingId)),
     });
-
-    return !!follow
+    return !!follow;
   }
 
-  static async create(newFollow) {    
-    newFollow.followingId = new ObjectId(String(newFollow.followingId));
-    return this.collection().insertOne(newFollow);
+  static async toggleFollow(followerId, followingId) {
+    const isFollowing = await this.checkUserFollow(followerId, followingId);
+
+    if (isFollowing) {
+      await this.collection().deleteOne({
+        followerId: new ObjectId(String(followerId)),
+        followingId: new ObjectId(String(followingId)),
+      });
+      return { message: "Unfollowed", isFollowing: false };
+    } else {
+      await this.collection().insertOne({
+        followerId: new ObjectId(String(followerId)),
+        followingId: new ObjectId(String(followingId)),
+        createdAt: new Date(),
+      });
+      return { message: "Followed", isFollowing: true };
+    }
   }
 
-  static async delete(followerId, followingId) {
-    return this.collection().deleteOne({
-      followerId: new ObjectId(String(followerId)),
-      followingId: new ObjectId(String(followingId)),
-    });
-  }
+
 }
 
 module.exports = followModel;

@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
-const redis = require("../config/ioRedis");
 const postModel = require("../model/postModel");
+
 const typeDefs = `#graphql
 type Post {
   _id: ID
@@ -22,7 +22,6 @@ type AuthorDetail{
   name: String
 }
 
-
 type Comment {
  username: String
  content: String
@@ -30,11 +29,10 @@ type Comment {
  updatedAt: String
 }
 
-
 type Like{
   username: String
   createdAt: String
- updatedAt: String
+  updatedAt: String
 }
 
 type Query {
@@ -46,6 +44,8 @@ type Mutation {
     createPost(content: String, tags: [String], imgUrl: String): Post
     addComent(postId:ID, content:String): Comment
     addLike(postId:ID): String
+    deletePost(postId:ID): String
+    updatePost(postId:ID, content:String, tags:[String], imgUrl:String): Post
 }
 `;
 
@@ -53,30 +53,16 @@ const resolvers = {
   Query: {
     getPosts: async (_, args, { authentication }) => {
       await authentication();
-
-      const postRedis = await redis.get("posts");
-      if (postRedis) {
-        const posts = JSON.parse(postRedis);
-        posts.forEach(post => {
-          if (post.createdAt) {
-            post.createdAt = new Date(post.createdAt);  
-          }
-        });
-        console.log(posts, "post from redis");
-        return posts;
-      }
       const post = await postModel.getAllPosts();
-      redis.set("posts", JSON.stringify(post));
-      console.log(post, "post from mongodb");
       return post;
     },
 
-    getPostsById: async (_, { _id },{authentication}) => {      
+    getPostsById: async (_, { _id }, { authentication }) => {      
       await authentication();
-      console.log(_id,'ini _id di getpostbyid');
+      console.log(_id, 'ini _id di getpostbyid');
       
       const post = await postModel.getPostById(_id);
-      console.log(post,'ini post di getpostbyid');
+      console.log(post, 'ini post di getpostbyid');
       
       return post;
     },
@@ -97,11 +83,48 @@ const resolvers = {
         updatedAt: new Date()
       };
       const getIdPost = await postModel.addPost(newPost);
-
       newPost._id = getIdPost.insertedId;
-      redis.del("posts");
       return newPost;
     },
+
+    deletePost: async (_, args, { authentication }) => {
+      const user = await authentication();
+      const { postId } = args;
+      const post = await postModel.getPostById(postId);
+      if (post.authorId.toString() !== user._id.toString()) {
+        throw new Error("Not authorized");
+      }
+      await postModel.deletePost(postId);
+      return "Post deleted";
+    },
+
+    updatePost: async (_, args, { authentication }) => {
+      const user = await authentication();
+      const { postId, content, tags, imgUrl } = args;
+      const post = await postModel.getPostById(postId);
+    
+      if (!post) {
+        throw new Error("Post not found");
+      }
+    
+      if (post.authorId.toString() !== user._id.toString()) {
+        throw new Error("Not authorized");
+      }
+    
+      const updatePost = {
+        content,
+        tags,
+        imgUrl,
+        updatedAt: new Date(),
+      };
+    
+      await postModel.updatePost(postId, updatePost);
+    
+      // Ambil data terbaru setelah update
+      const updatedPost = await postModel.getPostById(postId);
+      return updatedPost;
+    },
+    
 
     addComent: async (_, args, { authentication }) => {
       const user = await authentication();
@@ -113,7 +136,6 @@ const resolvers = {
         updatedAt: new Date().toISOString(),
       };
       await postModel.addComent(postId, comment);
-      redis.del("posts");
       return comment;
     },
 
@@ -124,7 +146,6 @@ const resolvers = {
       
       if (isLiked) {
         await postModel.removeLike(postId, user.username);
-        redis.del("posts");
         return "Unliked";
       } else {
         const like = {
@@ -133,10 +154,10 @@ const resolvers = {
           updatedAt: new Date(),
         };
         await postModel.addLike(postId, like);
-        redis.del("posts");
         return "Liked";
       }
     },
   },
 };
+
 module.exports = { typeDefs, resolvers };

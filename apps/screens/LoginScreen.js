@@ -4,7 +4,6 @@ import { AuthContext } from "../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   StyleSheet,
   Text,
@@ -13,7 +12,8 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import LottieView from "lottie-react-native";
+import Toast from "react-native-toast-message";
 const LOGIN = gql`
   mutation Login($username: String, $password: String) {
     login(username: $username, password: $password) {
@@ -24,12 +24,13 @@ const LOGIN = gql`
 `;
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("Steven");
+  const [password, setPassword] = useState("user1");
   const { setIsSignedIn } = useContext(AuthContext);
   const navigation = useNavigation();
 
   const [login, { loading }] = useMutation(LOGIN);
+
   const submitLogin = async () => {
     try {
       const result = await login({
@@ -42,26 +43,33 @@ export default function LoginScreen() {
 
       await SecureStore.setItemAsync("access_token", access_token);
       await SecureStore.setItemAsync("user_id", user_id);
+      await SecureStore.setItemAsync("username", username);
+
       setIsSignedIn(true);
     } catch (error) {
-      Alert.alert("Login Failed", error.message);
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2: error.message,
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 10,
+      });
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Logo */}
-      <View style={styles.logoContainer}>
-        <Image
-          source={{
-            uri: "https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg",
-          }}
-          style={styles.logo}
-        />
+      <Toast />
+      <View style={styles.logo}>
+        <Image source={require("../assets/line.png")} style={styles.logo} />
       </View>
 
       {/* Header */}
-      <Text style={styles.headerText}>Welcome to LINE</Text>
+      <Text style={styles.title}>Login to LINE</Text>
+      <Text style={styles.subtitle}>Please log in to continue</Text>
 
       {/* Input Fields */}
       <View style={styles.inputContainer}>
@@ -81,6 +89,7 @@ export default function LoginScreen() {
       </View>
 
       {/* Login Button */}
+
       {loading ? (
         <ActivityIndicator size="large" color="#00C300" />
       ) : (
@@ -103,26 +112,30 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: "center",
-    backgroundColor: "#F5F5F5",
-  },
-  logoContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    padding: 20,
   },
   logo: {
     width: 100,
     height: 100,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#00C300",
-    textAlign: "center",
     marginBottom: 20,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#00C300",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#555555",
+    marginBottom: 30,
+    textAlign: "center",
+  },
   inputContainer: {
+    width: "100%",
     marginBottom: 20,
   },
   input: {
@@ -134,19 +147,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     marginBottom: 10,
     fontSize: 16,
+    width: "100%",
   },
   loginButton: {
     backgroundColor: "#00C300",
     paddingVertical: 15,
-    borderRadius: 8,
+    paddingHorizontal: 50,
+    borderRadius: 25,
+    width: "80%",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   loginButtonText: {
-    color: "#FFF",
     fontSize: 16,
+    color: "#ffffff",
     fontWeight: "bold",
   },
+
   footer: {
     alignItems: "center",
   },
@@ -159,5 +176,14 @@ const styles = StyleSheet.create({
     color: "#00C300",
     fontWeight: "bold",
     marginTop: 5,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  lottie: {
+    width: 150,
+    height: 150,
   },
 });

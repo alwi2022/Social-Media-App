@@ -1,196 +1,177 @@
-import React, { useState } from "react";
 import {
   TextInput,
-  Button,
   View,
   StyleSheet,
   Text,
   FlatList,
   Image,
-  Alert,
-  ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
+
 import * as SecureStore from "expo-secure-store";
-const GET_USER_BY_USERNAME = gql`
-  query GetUserByUserName($username: String) {
-    getUserByUserName(username: $username) {
-      _id
-      name
-      username
-      email
-    }
-  }
-`;
-
-const UNFOLLOW_USER = gql`
-  mutation Unfollow($followingId: ID) {
-    unfollow(followingId: $followingId)
-  }
-`;
-
-const FOLLOW_USER = gql`
-  mutation Follow($followingId: ID) {
-    follow(followingId: $followingId)
-  }
-`;
-
 export default function SearchScreen() {
-  const [username, setUsername] = useState("");
-const userId = SecureStore.getItem("user_id");
-  const [followUser] = useMutation(FOLLOW_USER);
-  const [unfollowUser] = useMutation(UNFOLLOW_USER);
-  const [search, { loading, data, error, refetch }] =
-    useLazyQuery(GET_USER_BY_USERNAME);
-
-  const handleSearch = async () => {
-    if (!username.trim()) {
-      Alert.alert("Username is required");
-      return;
-    }
-    await search({ variables: { username } });
-  };
-
-  const handleUnFollow = async (followingId) => {
-    try {
-      const response = await unfollowUser({
-        variables: { followingId },
-      });
-
-      if (response.data.unfollow === "unfollow") {
-        Alert.alert("unfollow successful:", response.data.unfollow);
-      } else if (response.data.unfollow === "You already unfollow this user") {
-        Alert.alert(response.data.unfollow);
-      }
-    } catch (error) {
-      Alert.alert(error.message);
-    }
-  };
-
-  const handleFollow = async (followingId) => {
-    try {
-      const response = await followUser({ variables: { followingId } });
-      if (response.data.follow === "follow") {
-        Alert.alert("Follow successful:", response.data.follow);
-      } else if (response.data.follow === "You already follow this user") {
-        Alert.alert(response.data.follow);
-      }
-      await refetch();
-    } catch (error) {
-      console.log(error, "ini erro follow");
-
-      Alert.alert(error.message);
-    }
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="green" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text>{error.message}</Text>
-      </View>
-    );
-  }
-
+  const username = SecureStore.getItemAsync("username");
+  const navigate = useNavigation();
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <View>
-        {loading ? (
-          <ActivityIndicator size={"large"} color={"green"} />
-        ) : (
-          <Button title="Search" color="#00C300" onPress={handleSearch} />
-        )}
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.username}>{username}</Text>
+          <Text style={styles.status}>Search friend below this</Text>
+        </View>
+        <Image
+          source={{
+            uri: `https://avatar.iran.liara.run/public/boy?username=${username}`,
+          }}
+          style={styles.storyImage}
+        />
       </View>
 
-      <FlatList
-        data={data?.getUserByUserName?.filter((user) => user._id !== userId)}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <View style={styles.userCard}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={20}
+          color="#888"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Search by username"
+          value=""
+          onPress={() => navigate.navigate("SearchDetail")}
+        />
+      </View>
+
+      {/* Friend Actions */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Daftar Teman</Text>
+        <TouchableOpacity
+          style={styles.friendAction}
+          onPress={() => navigate.navigate("SearchDetail")}
+        >
+          <Ionicons
+            name="person-add"
+            size={24}
+            color="white"
+            style={styles.friendIcon}
+          />
+          <Text style={styles.friendText}>Tambah Teman</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.friendAction}>
+          <Ionicons
+            name="people"
+            size={24}
+            color="white"
+            style={styles.friendIcon}
+          />
+          <Text style={styles.friendText}>Buat Grup</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Sticker Recommendations */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Rekomendasi Stiker</Text>
+        <FlatList
+          horizontal
+          data={["Mr.Wayne", "Si tengil ", "Luffy", "Mis lily"]}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.stickerCard}>
               <Image
                 source={{
-                  uri: `https://avatar.iran.liara.run/public/boy?username=${item.username}`,
+                  uri: `https://image.pollinations.ai/prompt/${item}-sticker?model=flux-pro&width=800&height=800&nologo=true`,
                 }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "lightgray",
-                  marginRight: 10,
-                }}
+                style={styles.stickerImage}
               />
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                  {item.name}
-                </Text>
-                <Text style={{ fontSize: 14, color: "gray" }}>
-                  Username: {item.username}
-                </Text>
-                <Text style={styles.userDetails}>Email: {item.email}</Text>
-              </View>
+              <Text style={styles.stickerText}>{item}</Text>
             </View>
-
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-  <View style={{ flex: 1, marginRight: 5 }}>
-    <Button
-      title="Follow"
-      onPress={() => handleFollow(item._id)}
-      color="#00C300"
-    />
-  </View>
-  <View style={{ flex: 1, marginLeft: 5 }}>
-    <Button
-      title="Unfollow"
-      onPress={() => handleUnFollow(item._id)}
-      color="red"
-    />
-  </View>
-</View>
-
-          </View>
-        )}
-      />
+          )}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: {
+  container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#fff",
+    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 20,
+  },
+  username: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  status: {
+    fontSize: 14,
+    color: "#888",
+  },
+  storyImage: {
+    width: 50,
+    height: 50,
+    marginRight: 2,
+    borderRadius: 30,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f4f4f4",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+  },
+  searchIcon: {
+    marginRight: 10,
   },
   input: {
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 8,
-    borderRadius: 4,
-    borderColor: "gray",
+    flex: 1,
+    height: 40,
   },
-  userCard: {
+  section: {
+    marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  friendAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#00C300",
     padding: 15,
-    marginVertical: 10,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  friendIcon: {
+    marginRight: 10,
+  },
+  friendText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  stickerCard: {
+    alignItems: "center",
+    marginRight: 15,
+  },
+  stickerImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  stickerText: {
+    fontSize: 12,
+    marginTop: 5,
   },
 });
