@@ -90,7 +90,7 @@ export default function DetailScreen({ route }) {
         />
         <View style={styles.headerInfo}>
           <Text style={styles.username}>{data.getPostsById?.authorDetail.username}</Text>
-          <Text style={styles.subText}>@{data.getPostsById?.authorDetail.name}</Text>
+          <Text style={styles.subText}>{data.getPostsById?.authorDetail.name}</Text>
         </View>
         <AntDesign name="ellipsis1" size={22} color="#777" />
       </View>

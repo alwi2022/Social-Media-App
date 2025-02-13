@@ -81,12 +81,12 @@ export default function RootStack() {
             <stack.Screen
               name="SearchDetail"
               component={SearchScreenDetail}
-              options={{ title: "Search Users" }}
+              options={{ title: "Search users" }}
             />
             <stack.Screen
               name="Chat"
               component={ChatScreen}
-              options={{ title: "Chat Users" }}
+              options={{ title: "Chat users" }}
             />
             <stack.Screen
               name="ChatDetail"

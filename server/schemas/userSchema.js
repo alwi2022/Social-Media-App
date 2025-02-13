@@ -15,8 +15,12 @@ const typeDefs = `#graphql
 
 
   type FollowUser {
+    name: String
   username: String
   email: String
+  createdAt: String
+  updatedAt: String
+
 }
   
 
@@ -50,12 +54,11 @@ const resolvers = {
     getUserByUserName: async (_, args, { authentication }) => {
       const user = await authentication();
       const { username } = args;
-    
+
       const result = await UserModel.getUsername(username, user._id);
-    
+
       return result;
     },
-    
   },
 
   Mutation: {

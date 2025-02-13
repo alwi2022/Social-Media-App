@@ -82,6 +82,8 @@ class UserModel {
     };
   }
 
+
+
   static async getUsername(username, currentUserId) {
     const users = await this.collection()
       .aggregate([
@@ -173,6 +175,11 @@ class UserModel {
     const result = await this.collection().aggregate(agg).toArray();
     return result[0];
   }
+
+  static async findOne(query) {
+    return await this.collection().findOne(query);
+  }
+  
 }
 
 module.exports = UserModel;

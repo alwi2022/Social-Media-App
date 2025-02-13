@@ -29,6 +29,7 @@ class followModel {
         followerId: new ObjectId(String(followerId)),
         followingId: new ObjectId(String(followingId)),
         createdAt: new Date(),
+        updatedAt: new Date(),
       });
       return { message: "Followed", isFollowing: true };
     }

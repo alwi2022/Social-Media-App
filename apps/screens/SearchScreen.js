@@ -12,7 +12,9 @@ import { useNavigation } from "@react-navigation/native";
 
 import * as SecureStore from "expo-secure-store";
 export default function SearchScreen() {
-  const username = SecureStore.getItemAsync("username");
+  const username = SecureStore.getItem("username");
+  console.log(username, "ini username");
+
   const navigate = useNavigation();
   return (
     <View style={styles.container}>
@@ -48,7 +50,7 @@ export default function SearchScreen() {
 
       {/* Friend Actions */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Daftar Teman</Text>
+        <Text style={styles.sectionTitle}>Friends list</Text>
         <TouchableOpacity
           style={styles.friendAction}
           onPress={() => navigate.navigate("SearchDetail")}
@@ -59,7 +61,7 @@ export default function SearchScreen() {
             color="white"
             style={styles.friendIcon}
           />
-          <Text style={styles.friendText}>Tambah Teman</Text>
+          <Text style={styles.friendText}>Add friends</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.friendAction}>
           <Ionicons
@@ -68,13 +70,13 @@ export default function SearchScreen() {
             color="white"
             style={styles.friendIcon}
           />
-          <Text style={styles.friendText}>Buat Grup</Text>
+          <Text style={styles.friendText}>Create a group</Text>
         </TouchableOpacity>
       </View>
 
       {/* Sticker Recommendations */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Rekomendasi Stiker</Text>
+        <Text style={styles.sectionTitle}>Sticker Recommendations</Text>
         <FlatList
           horizontal
           data={["Mr.Wayne", "Si tengil ", "Luffy", "Mis lily"]}

@@ -128,7 +128,7 @@ export default function Postcard({ posts }) {
           />
           <View>
             <Text style={styles.username}>{posts.authorDetail?.username}</Text>
-            <Text style={styles.subText}>Official Account</Text>
+           <Text style={styles.subText}>{posts.authorDetail?.username === "Alwi" ? "Developer" : "Offcial Account"}</Text>
           </View>
         </View>
 

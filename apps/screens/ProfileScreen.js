@@ -1,12 +1,11 @@
 import { useCallback, useContext } from "react";
 import {
-  FlatList,
   Text,
   View,
-  ActivityIndicator,
   StyleSheet,
   Image,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
@@ -14,7 +13,8 @@ import { gql, useQuery } from "@apollo/client";
 import { AntDesign } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useFocusEffect } from "@react-navigation/native";
-
+import errorAnimation from "../assets/animations/error.json";
+import loadingAnimation from "../assets/animations/AnimationAMongus.json";
 const GET_USER_BY_ID = gql`
   query GetUserById($id: ID) {
     getUserById(_id: $id) {
@@ -35,35 +35,42 @@ export default function ProfileScreen() {
   const { setIsSignedIn } = useContext(AuthContext);
   const userId = SecureStore.getItem("user_id");
 
-  const { data, loading, error, refetch  } = useQuery(GET_USER_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_BY_ID, {
     variables: { id: userId },
     fetchPolicy: "network-only",
   });
-
 
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
-  if (loading) {
+  if (loading)
     return (
       <View style={styles.center}>
         <LottieView
-          source={require("../assets/animations/AnimationAMongus.json")}
+          source={loadingAnimation}
           autoPlay
           loop
-          style={{ width: 150, height: 150 }}
+          style={styles.lottie}
         />
-        <Text style={styles.loadingText}>Loading Profile...</Text>
+        <Text style={styles.loadingText}>Fetching Profile...</Text>
       </View>
     );
-  }
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text>Error: {error.message}</Text>
+      <View style={styles.errorContainer}>
+        <LottieView
+          source={errorAnimation}
+          autoPlay
+          loop
+          style={styles.errorLottie}
+        />
+        <Text style={styles.errorText}>Oops! Failed to load data.</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
+          <Text style={styles.retryText}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -193,5 +200,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
     marginTop: 10,
+  },
+
+  lottie: {
+    width: 150,
+    height: 150,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorLottie: {
+    width: 200,
+    height: 200,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ff5555",
+    marginTop: 10,
+  },
+  retryButton: {
+    marginTop: 20,
+    backgroundColor: "#ff5555",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+  },
+  retryText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

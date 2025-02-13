@@ -7,12 +7,14 @@ import {
   View,
   Pressable,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { gql, useQuery } from "@apollo/client";
 import Postcard from "../components/PostCard";
 import loadingAnimation from "../assets/animations/AnimationAMongus.json";
 import { useNavigation } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
+import errorAnimation from "../assets/animations/error.json"; //
 
 const GET_POST = gql`
   query GetPosts {
@@ -51,23 +53,32 @@ export default function HomeScreen() {
   });
 
   const navigate = useNavigation();
-  if (loading)
-    return (
-      <View style={styles.center}>
-        <LottieView
-          source={loadingAnimation}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-        <Text>Loading...</Text>
-      </View>
-    );
+  // if (loading)
+  //   return (
+  //     <View style={styles.center}>
+  //       <LottieView
+  //         source={loadingAnimation}
+  //         autoPlay
+  //         loop
+  //         style={styles.lottie}
+  //       />
+  //       <Text style={styles.loadingText}>Fetching Posts...</Text>
+  //     </View>
+  //   );
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text>Error: {error.message}</Text>
+      <View style={styles.errorContainer}>
+        <LottieView
+          source={errorAnimation}
+          autoPlay
+          loop
+          style={styles.errorLottie}
+        />
+        <Text style={styles.errorText}>Oops! Failed to load data.</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
+          <Text style={styles.retryText}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -202,5 +213,39 @@ const styles = StyleSheet.create({
   lottie: {
     width: 150,
     height: 150,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorLottie: {
+    width: 200,
+    height: 200,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ff5555",
+    marginTop: 10,
+  },
+  retryButton: {
+    marginTop: 20,
+    backgroundColor: "#ff5555",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+  },
+  retryText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
