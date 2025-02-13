@@ -24,6 +24,7 @@ type Query {
 
 type Mutation {
   createChat(username: String!): Chat
+  deleteChat(chatId: ID!): Chat
   sendMessage(chatId: ID!, content: String!): Message
 }
 `;
@@ -119,7 +120,7 @@ const resolvers = {
       // 🔥 Ambil detail user dari koleksi `users`
       const followedUsers = await UserModel.collection()
         .find({ _id: { $in: followedUserIds.map((f) => f.followingId) } })
-        .project({ _id: 1, username: 1,email:1, name: 1 }) 
+        .project({ _id: 1, username: 1, email: 1, name: 1 })
         .toArray();
 
       console.log("✅ Followed users fetched:", followedUsers);
@@ -188,6 +189,18 @@ const resolvers = {
       io.to(chatId).emit("newMessage", fullMessage);
 
       return fullMessage; // ✅ Kembalikan data lengkap agar langsung tampil di frontend
+    },
+
+    deleteChat: async (_, { chatId }) => {
+      const chat = await ChatModel.collection().findOne({
+        _id: new ObjectId(chatId),
+      });
+
+      if (!chat) throw new Error("Chat not found");
+
+      await ChatModel.collection().deleteOne({ _id: new ObjectId(chatId) });
+
+      return chat;
     },
   },
 };

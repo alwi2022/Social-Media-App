@@ -1,20 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
 import {
-  Alert,
+  ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { gql, useMutation } from "@apollo/client";
-import { formatDistanceToNow, set } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Modal from "react-native-modal";
-
+import { MaterialIcons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useState } from "react";
 const ADD_LIKE = gql`
@@ -61,7 +62,16 @@ const formatRelativeDate = (dateString) => {
 
 export default function Postcard({ posts }) {
   const navigation = useNavigation();
+  const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updatedContent, setUpdatedContent] = useState(posts.content);
+  const [updatedTags, setUpdatedTags] = useState(posts.tags.join(", "));
+  const [updatedImgUrl, setUpdatedImgUrl] = useState(posts.imgUrl);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(false);
   const [like, { loading }] = useMutation(ADD_LIKE, {
     refetchQueries: ["GetPosts"],
   });
@@ -72,15 +82,10 @@ export default function Postcard({ posts }) {
         variables: { postId },
       });
     } catch (error) {
-      Alert.alert(error.message);
+      setErrorMessage(error.message);
+      setShowErrorModal(true);
     }
   };
-
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updatedContent, setUpdatedContent] = useState(posts.content);
-  const [updatedTags, setUpdatedTags] = useState(posts.tags.join(", "));
-  const [updatedImgUrl, setUpdatedImgUrl] = useState(posts.imgUrl);
 
   const [deletePost] = useMutation(DELETE_POST, {
     refetchQueries: ["GetPosts"],
@@ -91,37 +96,23 @@ export default function Postcard({ posts }) {
   });
 
   const handleDelete = async () => {
-    Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deletePost({ variables: { postId: posts._id } });
-            Alert.alert(
-              "Post Deleted",
-              "The post has been deleted successfully."
-            );
+    setLoadingAction(true);
+    try {
+      await deletePost({ variables: { postId: posts._id } });
 
-            // Tambahkan delay sebelum modal ditutup
-            setTimeout(() => {
-              setShowModal(false);
-            }, 500);
-          } catch (error) {
-            Alert.alert("Error", error.message);
-          }
-        },
-      },
-    ]);
+      setShowDeleteModal(true);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setShowErrorModal(true);
+    } finally {
+      setLoadingAction(false);
+      setShowDeleteModal(false);
+    }
   };
 
   const handleUpdate = async () => {
+    setLoadingAction(true);
     try {
-      // Cegah imgUrl menjadi kosong
       const finalImgUrl =
         updatedImgUrl.trim() === "" ? posts.imgUrl : updatedImgUrl;
 
@@ -134,20 +125,73 @@ export default function Postcard({ posts }) {
         },
       });
 
-      Alert.alert("Post Updated", "The post has been updated successfully.");
-
       // Tambahkan delay agar modal tidak glitch
       setTimeout(() => {
         setShowUpdateModal(false);
       }, 500);
     } catch (error) {
-      Alert.alert("Error", error.message);
+      setErrorMessage(error.message);
+      setShowErrorModal(true);
+    } finally {
+      setLoadingAction(false);
+      setShowUpdateModal(false);
     }
   };
 
   return (
     <View style={styles.card}>
       {/* Header */}
+
+      <Modal
+        isVisible={showErrorModal}
+        onBackdropPress={() => setShowErrorModal(false)}
+        animationIn="shake"
+      >
+        <View style={styles.errorModal}>
+          <MaterialIcons name="error-outline" size={50} color="red" />
+          <Text style={styles.errorTitle}>Access Denied</Text>
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+          <Pressable
+            style={styles.errorButton}
+            onPress={() => setShowErrorModal(false)}
+          >
+            <Text style={styles.errorButtonText}>OK</Text>
+          </Pressable>
+        </View>
+      </Modal>
+
+      <Modal
+        isVisible={showDeleteModal}
+        onBackdropPress={() => !loadingAction && setShowDeleteModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <MaterialIcons name="delete" size={50} color="red" />
+          <Text style={styles.modalTitle}>Delete Post</Text>
+          <Text style={styles.modalMessage}>
+            Are you sure you want to delete this post?
+          </Text>
+          <View style={styles.buttonRow}>
+            <Pressable
+              style={styles.cancelButton}
+              onPress={() => setShowDeleteModal(false)}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              style={styles.deleteButton}
+              onPress={handleDelete}
+              disabled={loadingAction}
+            >
+              {loadingAction ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.deleteText}>Delete</Text>
+              )}
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Image
@@ -158,7 +202,11 @@ export default function Postcard({ posts }) {
           />
           <View>
             <Text style={styles.username}>{posts.authorDetail?.username}</Text>
-            <Text style={styles.subText}>{posts.authorDetail?.username === "Alwi" ? "Developer" : "Offcial Account"}</Text>
+            <Text style={styles.subText}>
+              {posts.authorDetail?.username === "Alwi"
+                ? "Developer"
+                : "Offcial Account"}
+            </Text>
           </View>
         </View>
 
@@ -175,9 +223,13 @@ export default function Postcard({ posts }) {
       </View>
 
       {/* Post Image */}
+      <TouchableOpacity onPress={() => navigation.navigate("Details", { id: posts._id, name: posts.content })}>
+
       {posts.imgUrl && (
-        <Image source={{ uri: posts.imgUrl }} style={styles.postImage} />
+        <Image source={{ uri: posts.imgUrl }} style={styles.postImage}  />
       )}
+      </TouchableOpacity>
+
 
       {/* Actions */}
       <View style={styles.actionsContainer}>
@@ -223,14 +275,13 @@ export default function Postcard({ posts }) {
         </Text>
       </View>
 
-      {/* Modal for Options */}
       {/* Modal untuk Opsi */}
       <Modal
         isVisible={showModal}
         onBackdropPress={() => setShowModal(false)}
         animationIn="fadeInUp"
         animationOut="fadeOutDown"
-        backdropOpacity={0.5} // Tambahkan efek transparan
+        backdropOpacity={0.5}
       >
         <View style={styles.modalContainer}>
           <Pressable
@@ -243,7 +294,10 @@ export default function Postcard({ posts }) {
             <Text style={styles.modalText}>Update</Text>
           </Pressable>
           <Pressable
-            onPress={handleDelete}
+            onPress={() => {
+              setShowModal(false);
+              setTimeout(() => setShowDeleteModal(true), 200);
+            }}
             style={[styles.modalButton, { backgroundColor: "red" }]}
           >
             <Text style={styles.modalText}>Delete</Text>
@@ -251,46 +305,54 @@ export default function Postcard({ posts }) {
         </View>
       </Modal>
 
+      {/* //showUpdateModal */}
       <Modal
         isVisible={showUpdateModal}
         onBackdropPress={() => setShowUpdateModal(false)}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.5}
       >
-        <View style={styles.updateModalContainer}>
+        <View style={styles.modalContainer}>
+          <MaterialIcons name="edit" size={50} color="blue" />
           <Text style={styles.modalTitle}>Update Post</Text>
-
           <TextInput
             style={styles.input}
             value={updatedContent}
             onChangeText={setUpdatedContent}
-            multiline
             placeholder="Update content..."
-            onFocus={() => setShowUpdateModal(true)} // Pastikan tetap terbuka
+            multiline
           />
-
           <TextInput
             style={styles.input}
             value={updatedTags}
             onChangeText={setUpdatedTags}
-            multiline
             placeholder="Update tags..."
-            onFocus={() => setShowUpdateModal(true)}
+            multiline
           />
-
           <TextInput
             style={styles.input}
             value={updatedImgUrl}
             onChangeText={setUpdatedImgUrl}
-            multiline
             placeholder="Update image URL..."
-            onFocus={() => setShowUpdateModal(true)}
+            multiline
           />
-
-          <Pressable onPress={handleUpdate} style={styles.modalButton}>
-            <Text style={styles.modalText}>Save</Text>
-          </Pressable>
+          <View style={styles.buttonRow}>
+            <Pressable
+              style={styles.cancelButton}
+              onPress={() => setShowUpdateModal(false)}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              style={styles.updateButton}
+              onPress={handleUpdate}
+              disabled={loadingAction}
+            >
+              {loadingAction ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.updateText}>Save</Text>
+              )}
+            </Pressable>
+          </View>
         </View>
       </Modal>
     </View>
@@ -298,6 +360,33 @@ export default function Postcard({ posts }) {
 }
 
 const styles = StyleSheet.create({
+  buttonRow: {
+    flexDirection: "row",
+    marginTop: 15,
+  },
+
+  deleteButton: {
+    backgroundColor: "red",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
+  updateButton: {
+    backgroundColor: "blue",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+
+  updateText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 15,
@@ -311,12 +400,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
+
   avatarContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -327,6 +411,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
+
   username: {
     fontWeight: "bold",
     fontSize: 14,
@@ -396,23 +481,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  avatarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  modalContainer: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-  },
+
   modalButton: {
     padding: 10,
+    width: "100%",
     backgroundColor: "#007AFF",
     borderRadius: 5,
     alignItems: "center",
@@ -422,15 +494,73 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  updateModalContainer: {
-    backgroundColor: "white",
+
+  errorModal: {
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "red",
+    marginTop: 10,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  errorButton: {
+    backgroundColor: "red",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  errorButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  modalMessage: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+
+  cancelButton: {
+    backgroundColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+
+  cancelText: {
+    color: "#000",
+    fontWeight: "bold",
+  },
+
   input: {
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+    width: "100%",
   },
 });

@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -11,7 +10,6 @@ import {
 } from "react-native";
 import { gql, useQuery } from "@apollo/client";
 import Postcard from "../components/PostCard";
-import loadingAnimation from "../assets/animations/AnimationAMongus.json";
 import { useNavigation } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
 import errorAnimation from "../assets/animations/error.json"; //
@@ -53,18 +51,7 @@ export default function HomeScreen() {
   });
 
   const navigate = useNavigation();
-  // if (loading)
-  //   return (
-  //     <View style={styles.center}>
-  //       <LottieView
-  //         source={loadingAnimation}
-  //         autoPlay
-  //         loop
-  //         style={styles.lottie}
-  //       />
-  //       <Text style={styles.loadingText}>Fetching Posts...</Text>
-  //     </View>
-  //   );
+
 
   if (error) {
     return (

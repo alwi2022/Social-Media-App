@@ -3,7 +3,6 @@ import TabNavigator from "./TabNavigator";
 import DetailScreen from "../screens/DetailScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
@@ -43,19 +42,15 @@ export default function RootStack() {
 
   return (
     <>
-    
       <stack.Navigator
         screenOptions={{
-          // headerStyle: { backgroundColor: "#00C300" },
-          // headerTintColor: "#fff",
-          // headerTitleStyle: { fontWeight: "bold" },
           headerShown: true,
         }}
       >
         {isSignedIn ? (
           <>
             <stack.Screen
-              name="Home"
+              name="Main"
               component={TabNavigator}
               options={({ route }) => {
                 const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
@@ -91,7 +86,7 @@ export default function RootStack() {
             <stack.Screen
               name="ChatDetail"
               component={ChatDetail}
-              options={{ title: "Chat Detail" }}
+              options={{ title: "Chat" }}
             />
             <stack.Screen
               name="CreatePost"
@@ -101,7 +96,7 @@ export default function RootStack() {
           </>
         ) : (
           <>
-          <stack.Screen name="Get-Started" component={WelcomeScreen} />
+            <stack.Screen name="Get-Started" component={WelcomeScreen} />
             <stack.Screen name="Login" component={LoginScreen} />
             <stack.Screen name="Register" component={RegisterScreen} />
           </>

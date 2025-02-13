@@ -23,9 +23,6 @@ type Mutation{
 `;
 
 const resolvers = {
-
-  
-
   Mutation: {
     async toggleFollow(_, { followingId }, { authentication }) {
       const user = await authentication();

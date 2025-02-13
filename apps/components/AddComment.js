@@ -34,7 +34,6 @@ export default function AddComment({ postId, refetch }) {
           content: comment,
         },
       });
-      Alert.alert("Succes add new comment");
       Keyboard.dismiss();
       setComment("");
       await refetch();

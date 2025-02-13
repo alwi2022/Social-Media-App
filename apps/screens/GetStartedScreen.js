@@ -14,7 +14,7 @@ const WelcomeScreen = () => {
       />
       <Text style={styles.title}>Welcome to LINE</Text>
       <Text style={styles.subtitle}>
-        Free messaging, voice and video calls, and more!
+        Connect with your friends and family with LINE
       </Text>
       <TouchableOpacity
         style={styles.buttonPrimary}

@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -47,6 +48,7 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [register, { loading }] = useMutation(REGISTER);
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -59,159 +61,90 @@ export default function RegisterScreen() {
     }).start();
   }, []);
 
-  const submitRegister = async () => {
+  const validateForm = () => {
     if (!name || !username || !email || !password) {
-      Toast.show({
-        type: "error",
-        text1: "Register Failed",
-        text2: "All fields are required",
-        visibilityTime: 3000,
-        topOffset: 10,
-      });
-      return;
+      setErrorMessage("All fields are required");
+      return false;
     }
     if (!email.includes("@") || !email.includes(".")) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Email",
-        text2: "Please enter a valid email",
-        visibilityTime: 3000,
-        topOffset: 10,
-      });
-      return;
+      setErrorMessage("Please enter a valid email");
+      return false;
     }
     if (password.length < 6) {
-      Toast.show({
-        type: "error",
-        text1: "Weak Password",
-        text2: "Password must be at least 6 characters",
-        visibilityTime: 3000,
-        topOffset: 10,
-      });
-      return;
+      setErrorMessage("Password must be at least 6 characters");
+      return false;
     }
+    setErrorMessage("");
+    return true;
+  };
 
+  const submitRegister = async () => {
+    if (!validateForm()) return;
     try {
       const result = await register({
         variables: { name, username, email, password },
       });
       const access_token = result.data.register._id;
       await SecureStore.setItemAsync("access_token", access_token);
-
-      Toast.show({
-        type: "success",
-        text1: "Success!",
-        text2: "Account created successfully",
-        visibilityTime: 3000,
-        topOffset: 10,
-      });
-
       navigation.navigate("Login");
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Register Failed",
         text2: error.message,
+        position: "top",
         visibilityTime: 3000,
+        autoHide: true,
         topOffset: 10,
       });
     }
   };
 
   return (
-    <LinearGradient colors={["#ffffff", "#ffffff"]} style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.innerContainer}
-      >
+    <LinearGradient colors={["#00c300", "#008000"]} style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.innerContainer}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView contentContainerStyle={styles.scrollView}>
             <Toast />
             <Animated.View style={[styles.animatedView, { opacity: fadeAnim }]}>
               {/* Lottie Animation */}
-              <LottieView
-                source={require("../assets/animations/HumanWalkinWithDog.json")}
-                autoPlay
-                loop
-                style={styles.lottie}
-              />
-
+              <LottieView source={require("../assets/animations/HumanWalkinWithDog.json")} autoPlay loop style={styles.lottie} />
+              
               {/* Header */}
               <Text style={styles.title}>Create Your Account</Text>
               <Text style={styles.subtitle}>Sign up to get started!</Text>
 
+              {/* Error Message */}
+              {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
               {/* Input Fields */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <MaterialIcons
-                    name="person"
-                    size={24}
-                    color="#666"
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Name"
-                    onChangeText={setName}
-                    value={name}
-                    style={styles.input}
-                  />
+                  <MaterialIcons name="person" size={24} color="#666" style={styles.inputIcon} />
+                  <TextInput placeholder="Name" onChangeText={setName} value={name} style={styles.input} />
                 </View>
 
                 <View style={styles.inputWrapper}>
-                  <MaterialIcons
-                    name="badge"
-                    size={24}
-                    color="#666"
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Username"
-                    onChangeText={setUsername}
-                    value={username}
-                    style={styles.input}
-                  />
+                  <MaterialIcons name="alternate-email" size={24} color="#666" style={styles.inputIcon} />
+                  <TextInput placeholder="Username" onChangeText={setUsername} value={username} style={styles.input} />
                 </View>
 
                 <View style={styles.inputWrapper}>
-                  <MaterialIcons
-                    name="email"
-                    size={24}
-                    color="#666"
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Email"
-                    onChangeText={setEmail}
-                    value={email}
-                    style={styles.input}
-                  />
+                  <MaterialIcons name="email" size={24} color="#666" style={styles.inputIcon} />
+                  <TextInput placeholder="Email" onChangeText={setEmail} value={email} style={styles.input} />
                 </View>
 
                 <View style={styles.inputWrapper}>
-                  <Ionicons
-                    name="lock-closed"
-                    size={24}
-                    color="#666"
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Password"
-                    onChangeText={setPassword}
-                    value={password}
-                    style={styles.input}
-                    secureTextEntry
-                  />
+                  <Ionicons name="lock-closed" size={24} color="#666" style={styles.inputIcon} />
+                  <TextInput placeholder="Password" onChangeText={setPassword} value={password} style={styles.input} secureTextEntry />
                 </View>
               </View>
 
               {/* Register Button */}
               {loading ? (
-                <ActivityIndicator size="large" color="#00C300" />
+                <ActivityIndicator size="large" color="#fff" />
               ) : (
-                <TouchableOpacity
-                  style={styles.registerButton}
-                  onPress={submitRegister}
-                >
+                <TouchableOpacity style={styles.registerButton} onPress={submitRegister}>
                   <Text style={styles.registerButtonText}>Sign Up</Text>
                 </TouchableOpacity>
               )}
@@ -234,7 +167,6 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
   },
   innerContainer: {
     flex: 1,
@@ -258,12 +190,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 5,
-    color: "#00C300",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#f0f0f0",
     marginBottom: 20,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
   inputContainer: {
     width: "100%",
@@ -276,8 +212,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     paddingLeft: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
   },
   inputIcon: {
     marginRight: 10,
@@ -287,9 +221,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     paddingHorizontal: 10,
+    backgroundColor: "#FFF",
+    borderWidth: 1,
+    borderColor: "#CCC",
   },
   registerButton: {
-    backgroundColor: "#00C300",
+    backgroundColor: "#fff",
     paddingVertical: 15,
     borderRadius: 25,
     width: "80%",
@@ -298,7 +235,7 @@ const styles = StyleSheet.create({
   },
   registerButtonText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#00c300",
     fontWeight: "bold",
   },
   footer: {
@@ -306,7 +243,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
-    color: "#00C300",
+    color: "#fff",
     fontWeight: "bold",
   },
 });

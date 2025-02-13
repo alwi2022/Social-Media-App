@@ -5,11 +5,10 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  TextInput,
   Alert,
   Modal,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery, useMutation, gql } from "@apollo/client";
@@ -20,6 +19,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { MaterialIcons } from "@expo/vector-icons";
 import errorAnimation from "../assets/animations/error.json"; //
 import LottieView from "lottie-react-native";
+import { Swipeable } from "react-native-gesture-handler";
+import { ActivityIndicator } from "react-native-paper";
 dayjs.extend(relativeTime); // Untuk format waktu relatif seperti "2 minutes ago"
 const GET_CHATS = gql`
   query GetChats {
@@ -54,6 +55,14 @@ const CREATE_CHAT = gql`
   }
 `;
 
+const DELETE_CHAT = gql`
+  mutation DeleteChat($chatId: ID!) {
+    deleteChat(chatId: $chatId) {
+      _id
+    }
+  }
+`;
+
 const GET_FOLLOWED_USERS = gql`
   query GetFollowedUsers {
     getFollowedUsers {
@@ -68,6 +77,8 @@ export default function ChatScreen() {
   const { data, refetch, error } = useQuery(GET_CHATS, {
     fetchPolicy: "network-only",
   });
+  const [deleteChat] = useMutation(DELETE_CHAT);
+
   const [createChat] = useMutation(CREATE_CHAT);
   const { data: followedUsers, refetch: refetchFollowedUser } = useQuery(
     GET_FOLLOWED_USERS,
@@ -78,6 +89,7 @@ export default function ChatScreen() {
   const [socket, setSocket] = useState(null);
   const [loggedInUser, setLoggedInUser] = useState(""); // Menyimpan username yang sedang login
   const [modalVisible, setModalVisible] = useState(false);
+  const [isCreatingChat, setIsCreatingChat] = useState(false);
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       const storedUsername = await SecureStore.getItemAsync("username");
@@ -123,6 +135,7 @@ export default function ChatScreen() {
 
   // 🔥 Fungsi untuk Membuat Chat Baru
   const handleCreateChat = async (selectedUsername) => {
+    setIsCreatingChat(true);
     try {
       const { data } = await createChat({
         variables: { username: selectedUsername },
@@ -137,8 +150,31 @@ export default function ChatScreen() {
       }
     } catch (error) {
       Alert.alert("Error", error.message);
+    } finally {
+      setIsCreatingChat(false);
     }
   };
+
+  const handleDeleteChat = async (chatId) => {
+    try {
+      await deleteChat({ variables: { chatId } });
+      refetch();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const filteredChats = useMemo(() => {
+    return (
+      data?.getChats
+        ?.filter((chat) => chat.users.some((u) => u.username === loggedInUser))
+        .sort(
+          (a, b) =>
+            Number(b.messages[b.messages.length - 1]?.createdAt || 0) -
+            Number(a.messages[a.messages.length - 1]?.createdAt || 0)
+        ) || []
+    );
+  }, [data, loggedInUser]);
 
   return (
     <View style={styles.container}>
@@ -168,17 +204,7 @@ export default function ChatScreen() {
         </View>
       )}
       <FlatList
-        data={
-          data?.getChats
-            ?.filter((chat) =>
-              chat.users.some((u) => u.username === loggedInUser)
-            )
-            .sort(
-              (a, b) =>
-                Number(b.messages[b.messages.length - 1]?.createdAt || 0) -
-                Number(a.messages[a.messages.length - 1]?.createdAt || 0)
-            ) // 🔥 Sortir berdasarkan waktu terbaru
-        }
+        data={filteredChats}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => {
           const otherUser = item.users.find((u) => u.username !== loggedInUser);
@@ -189,49 +215,60 @@ export default function ChatScreen() {
             : "";
 
           return (
-            <TouchableOpacity
-              style={styles.chatRow}
-              onPress={() =>
-                navigation.navigate("ChatDetail", {
-                  chatId: item._id,
-                  name: otherUser.username,
-                })
-              }
+            <Swipeable
+              renderRightActions={() => (
+                <TouchableOpacity
+                  onPress={() => handleDeleteChat(item._id)}
+                  style={styles.deleteSwipe}
+                >
+                  <MaterialIcons name="delete" size={24} color="white" />
+                </TouchableOpacity>
+              )}
             >
-              <Image
-                source={{
-                  uri: `https://avatar.iran.liara.run/public/boy?username=${otherUser.username}`,
-                }}
-                style={styles.profileImage}
-              />
-              <View style={styles.chatInfo}>
-                <Text style={styles.chatName}>{otherUser.username}</Text>
-                <View style={styles.messageRow}>
-                  <Text
-                    style={[
-                      styles.chatMessage,
-                      lastMessage ? styles.boldText : null,
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {lastMessage
-                      ? `${lastMessage.content.substring(0, 30)}${
-                          lastMessage.content.length > 30 ? "..." : ""
-                        }`
-                      : "No messages yet"}
-                  </Text>
-                  {lastMessage && (
-                    <Text style={styles.timestamp}>
-                      {" "}
+              <TouchableOpacity
+                style={styles.chatRow}
+                onPress={() =>
+                  navigation.navigate("ChatDetail", {
+                    chatId: item._id,
+                    name: otherUser.username,
+                  })
+                }
+              >
+                <Image
+                  source={{
+                    uri: `https://avatar.iran.liara.run/public/boy?username=${otherUser.username}`,
+                  }}
+                  style={styles.profileImage}
+                />
+                <View style={styles.chatInfo}>
+                  <Text style={styles.chatName}>{otherUser.username}</Text>
+                  <View style={styles.messageRow}>
+                    <Text
+                      style={[
+                        styles.chatMessage,
+                        lastMessage ? styles.boldText : null,
+                      ]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
                       {lastMessage
-                        ? dayjs(Number(lastMessage.createdAt)).format("HH:mm")
-                        : ""}
+                        ? `${lastMessage.content.substring(0, 30)}${
+                            lastMessage.content.length > 30 ? "..." : ""
+                          }`
+                        : "No messages yet"}
                     </Text>
-                  )}
+                    {lastMessage && (
+                      <Text style={styles.timestamp}>
+                        {" "}
+                        {lastMessage
+                          ? dayjs(Number(lastMessage.createdAt)).format("HH:mm")
+                          : ""}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </Swipeable>
           );
         }}
       />
@@ -244,9 +281,10 @@ export default function ChatScreen() {
         <Ionicons name="chatbubble-ellipses" size={30} color="white" />
       </TouchableOpacity>
 
-      <Modal visible={modalVisible} animationType="slide">
+      <Modal visible={modalVisible} animationType="fade" transparent>
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Select a user to chat</Text>
+          {isCreatingChat && <ActivityIndicator size="large" color="#00C300" />}
 
           {followedUsers?.getFollowedUsers?.length === 0 && (
             <View style={styles.modalEmptyContainer}>
@@ -286,6 +324,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
   },
+  deleteSwipe: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 75,
+    height: "100%",
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)", // Efek transparan
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  badge: {
+    backgroundColor: "red",
+    borderRadius: 15,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    right: 10,
+    top: 10,
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+
   inputContainer: {
     flexDirection: "row",
     padding: 10,

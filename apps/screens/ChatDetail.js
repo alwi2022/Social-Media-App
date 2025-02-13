@@ -17,7 +17,6 @@ import * as SecureStore from "expo-secure-store";
 import dayJs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import errorAnimation from "../assets/animations/error.json"; //
-import loadingAnimation from "../assets/animations/AnimationAMongus.json";
 import LottieView from "lottie-react-native";
 // Aktifkan plugin relativeTime untuk Day.js
 dayJs.extend(relativeTime);
@@ -50,7 +49,7 @@ const SEND_MESSAGE = gql`
 
 export default function ChatDetailScreen({ route }) {
   const { chatId } = route.params;
-  const { error, loading, data, refetch } = useQuery(GET_MESSAGES, {
+  const { error, data, refetch } = useQuery(GET_MESSAGES, {
     fetchPolicy: "network-only",
   });
   const [sendMessage] = useMutation(SEND_MESSAGE, {
@@ -113,20 +112,6 @@ export default function ChatDetailScreen({ route }) {
     }
   };
 
-  // if (loading)
-  //   return (
-  //     <View style={styles.center}>
-  //       <LottieView
-  //         source={loadingAnimation}
-  //         autoPlay
-  //         loop
-  //         style={styles.lottie}
-  //       />
-  //       <Text style={styles.loadingText}>
-  //         Sorry if you are experiencing this loading ...
-  //       </Text>
-  //     </View>
-  //   );
 
   if (error) {
     return (
@@ -177,7 +162,7 @@ export default function ChatDetailScreen({ route }) {
               <Text style={styles.messageText}>{item.content}</Text>
               <Text style={styles.messageTime}>
                 {dayJs(Number(item.createdAt)).fromNow()}{" "}
-                {/* ✅ Fix waktu relatif */}
+         
               </Text>
             </View>
           </View>
@@ -185,7 +170,7 @@ export default function ChatDetailScreen({ route }) {
         inverted={false}
       />
 
-      {/* Input Container */}
+     
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.inputContainer}
