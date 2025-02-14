@@ -1,25 +1,58 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=17683544&assignment_repo_type=AssignmentRepo)
+Realtime Chat & Social Media App (Line Clone)
+Aplikasi ini adalah platform media sosial dan chat real-time yang memungkinkan pengguna untuk membuat postingan, berkomentar, menyukai postingan, serta mengirim pesan secara langsung. Dibangun menggunakan React Native (Expo), Node.js (Express), GraphQL, MongoDB, dan Socket.io untuk pengalaman interaksi yang lancar dan real-time.
 
-# GC01
+🛠 Tech Stack
+Frontend (React Native - Expo)
+⚡ React Native - Framework untuk aplikasi mobile.
+⚡ React Navigation - Navigasi antar halaman.
+⚡ Apollo Client - Konsumsi API GraphQL.
+⚡ Lottie - Animasi interaktif.
+Backend (Node.js - Express)
+⚡ Express.js - Framework backend.
+⚡ GraphQL (Apollo Server) - API fleksibel untuk komunikasi data.
+⚡ MongoDB - Database utama untuk user management & daftar percakapan.
+⚡ Socket.io - Implementasi real-time chat.
+⚡ Zod - Validasi input.
+⚡ JWT (JSON Web Token) - Authentication & Authorization.
+🎨 Fitur Utama
+✅ User Authentication - Register & login dengan JWT.
+✅ Post Management - Buat, edit, hapus, dan like postingan.
+✅ Comment System - Berikan komentar pada postingan pengguna lain.
+✅ Realtime Chat - Menggunakan Socket.io untuk mengirim dan menerima pesan secara langsung.
+✅ Follow System - Hanya bisa mengirim pesan ke pengguna yang sudah di-follow.
+✅ UI Minimalis & Responsif - Menggunakan React Native & Expo untuk tampilan yang clean dan smooth.
 
-## My Social Media App
+Cara Menjalankan Proyek
+1️⃣ Clone Repository
+git clone https://github.com/username/realtime-chat-social-media.git
 
-My Social Media App adalah sebuah aplikasi client(mobile)-server. Challenge ini juga merupakan salah satu aplikasi mobile pertama dan terakhir kamu, jadi kerjakan dengan baik sebagai bekal portofolio kamu. Pada challenge ini, kamu diminta untuk membuat aplikasi client(mobile)-server dengan detail sebagai berikut:
+cd realtime-chat-social-media
+2️⃣ Install Dependencies
+🔹 Backend
+cd server
+npm install
 
-### Struktur Folder
+🔹 Frontend
+cd apps
+npm install
 
-- [V] server: untuk menyimpan aplikasi server GraphQL kamu
-- [V] app: untuk menyimpan aplikasi mobile React Native kamu
+3️⃣ Setup Environment Variables
+🔹 Backend (.env)
+env
+PORT=3000
+MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/mydb
+SECRET=your_jwt_secret
+SOCKET_PORT=4000
 
-### Fitur
+4️⃣ Jalankan Backend & Frontend
+🔹 Backend
+cd server
+npm run dev
 
-- [V] Fitur Register
-- [V] Fitur Login
-- [V] FItur Add Post
-- [V] Fitur Show Post (berdasarkan yang paling baru)
-- [V] Fitur Comment Post (Embedded Document)
-- [V] Fitur search user berdasarkan nama atau username
-- [V] Fitur follow
-- [V] Menampilkan Followers dan Following dari setiap user (Reference with $lookup)
-- [V] Fitur Like Post
-- [V] Menampilkan total like dari setiap post
+🔹 Frontend
+cd apps
+npm start
+
+📩 Kontak
+📧 Email: imambahrialwi21@gmail.com
+🌐 LinkedIn: https://www.linkedin.com/in/imam-bahri-alwi-019816250/
