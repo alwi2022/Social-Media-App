@@ -30,8 +30,8 @@ Aplikasi ini adalah platform media sosial dan chat real-time yang memungkinkan p
 
 ### **1️⃣ Clone Repository**
 ```sh
-git clone https://github.com/username/realtime-chat-social-media.git
-cd realtime-chat-social-media
+git clone https://github.com/alwi2022/Social-Media-App.git
+cd Social-Media-App
 ```
 
 ### **2️⃣ Install Dependencies**
