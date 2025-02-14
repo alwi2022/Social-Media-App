@@ -290,6 +290,9 @@ export default function ChatScreen() {
             <View style={styles.modalEmptyContainer}>
               <MaterialIcons name="person-off" size={80} color="#ccc" />
               <Text style={styles.modalEmptyText}>No users available</Text>
+              <Text style={styles.modalEmptyTextconverstation}>
+                To start a conversation, you need to follow someone first.
+              </Text>
             </View>
           )}
           <FlatList
@@ -507,6 +510,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
     marginTop: 10,
+  },
+  modalEmptyTextconverstation: {
+    fontSize: 16,
+    color: "#888",
+    marginTop: 10,
+    textAlign: "center",
   },
 
   errorContainer: {

@@ -50,7 +50,7 @@ export default function RegisterScreen() {
   const [register, { loading }] = useMutation(REGISTER);
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
+  const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -59,7 +59,7 @@ export default function RegisterScreen() {
     }).start();
   }, []);
 
-  const submitRegister = async () => {
+  const validateForm = () => {
     if (!name || !username || !email || !password) {
       Toast.show({
         type: "error",
@@ -68,8 +68,13 @@ export default function RegisterScreen() {
         visibilityTime: 3000,
         topOffset: 10,
       });
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const submitRegister = async () => {
+    if (!validateForm()) return;
     if (!email.includes("@") || !email.includes(".")) {
       Toast.show({
         type: "error",
@@ -239,6 +244,11 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     justifyContent: "center",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 15,
   },
   scrollView: {
     flexGrow: 1,

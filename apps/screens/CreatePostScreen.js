@@ -101,7 +101,7 @@ export default function CreatePostScreen() {
         topOffset: 10,
       });
 
-      navigation.navigate("Home");
+      navigation.navigate("Main");
     } catch (error) {
       Toast.show({
         type: "error",

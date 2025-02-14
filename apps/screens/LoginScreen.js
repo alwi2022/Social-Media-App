@@ -15,7 +15,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 const LOGIN = gql`
   mutation Login($username: String, $password: String) {
@@ -105,13 +105,27 @@ export default function LoginScreen() {
 
         {/* Input Fields */}
         <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Username"
-            onChangeText={setUsername}
-            value={username}
-            style={styles.input}
-          />
-          <View style={styles.passwordWrapper}>
+          <View style={styles.inputWrapper}>
+            <MaterialIcons
+              name="badge"
+              size={24}
+              color="#666"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              placeholder="Username"
+              onChangeText={setUsername}
+              value={username}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="lock-closed"
+              size={24}
+              color="#666"
+              style={styles.inputIcon}
+            />
             <TextInput
               placeholder="Password"
               onChangeText={setPassword}
@@ -163,6 +177,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingLeft: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
   logo: {
     width: 100,
     height: 100,
@@ -186,20 +213,11 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderWidth: 1,
-    borderColor: "#CCC",
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: "#FFF",
+    flex: 1,
     fontSize: 16,
-    width: "100%",
-    marginBottom: 10,
+    paddingHorizontal: 10,
   },
-  passwordWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    position: "relative",
-  },
+
   eyeIcon: {
     position: "absolute",
     right: 10,
