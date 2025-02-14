@@ -48,11 +48,6 @@ Buatlah lookup/relasi pada method/fungsi yang berhubungan dengan MongoDB yang su
   - [V] Menampilkan list nama/username user following
 
 
-### Redis - Cache
-Implementasikan cache pada aplikasi GraphQL server yang sudah dibuat dengan detail sebagai berikut:
-- [V] Implementasikan cache pada Get Post (Query)
-- [V] Invalidate cache pada Add Post (Mutation)
-
 ## Day 3
 ### React Native
 Buatlah aplikasi mobile React-Native dengan menggunakan expo. Aplikasi ini adalah client side dari challenge My Social Media App.
@@ -85,4 +80,3 @@ Lakukan komunikasi Aplikasi Mobile (react-native) menggunakan apollo client ke s
 - [V] Follow (Mutation)
 - [V] Get User (Query)
 - [V] Like Post (Mutation)
-
