@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "apps",
+    "slug": "apps",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/line2.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/line2.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#00c200"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/line2.png",
+        "backgroundColor": "#00c200"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-secure-store"],
+    "extra": {
+      "eas": {
+        "projectId": "366ce719-ed53-4b1c-b52d-d6a18c1ea878"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/366ce719-ed53-4b1c-b52d-d6a18c1ea878"
+    }
+  }
+}

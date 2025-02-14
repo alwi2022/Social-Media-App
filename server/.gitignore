@@ -1,0 +1,6 @@
+node_modules
+.env
+server/config/serviceAccountKey.json
+server/config/firebaseConfig.js
+server/config/firebaseAdminConfig.js
+server/config/firebaseService.js
